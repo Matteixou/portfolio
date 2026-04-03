@@ -9,6 +9,7 @@ interface ProjectCardProps {
   icon: string;
   link?: string;
   accent?: "purple" | "green";
+  wip?: boolean;
 }
 
 const styles = {
@@ -41,6 +42,7 @@ export default function ProjectCard({
   icon,
   link,
   accent = "purple",
+  wip = false,
 }: ProjectCardProps) {
   const s = styles[accent];
   const glowClass = accent === "purple" ? "glow-purple" : "glow-green";
@@ -68,6 +70,14 @@ export default function ProjectCard({
         <div
           className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent ${s.glowLine} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
         />
+
+        {/* WIP Badge */}
+        {wip && (
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30">
+            <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+            <span className="text-xs font-mono text-yellow-400">En cours</span>
+          </div>
+        )}
 
         {/* Icon + Title */}
         <div className="flex items-center gap-3 mb-4">

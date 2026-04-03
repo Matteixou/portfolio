@@ -16,6 +16,7 @@ const PROJECTS = [
     tags: ["HTML/CSS", "Node.js", "JavaScript", "E-commerce"],
     icon: "🛒",
     accent: "purple" as const,
+    wip: true,
   },
   {
     title: "Codapp — AI Dev Assistant",
