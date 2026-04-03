@@ -18,11 +18,12 @@ const PROJECTS = [
     accent: "purple" as const,
   },
   {
-    title: "Interface Créateurs",
+    title: "Codapp — AI Dev Assistant",
     description:
-      "Dashboard UX/UI orienté créateurs de contenu. Interface intuitive pour gérer streams, analytics et communauté.",
-    tags: ["React", "Tailwind CSS", "UX/UI", "Figma"],
-    icon: "🎨",
+      "Assistant développeur IA multi-agents et open-source. Boucle ReAct autonome avec 7 outils, RAG, mémoire persistante, interface web dark theme, CLI et extension VS Code. Compatible Mistral AI / Ollama.",
+    tags: ["Node.js", "Express", "Mistral AI", "Ollama", "WebSocket"],
+    icon: "🤖",
+    link: "https://github.com/Matteixou",
     accent: "green" as const,
   },
   {
