@@ -1,0 +1,185 @@
+# TASKS — Portfolio Matthieu Feracho
+
+> Backlog issu d'un audit complet du 7 octobre 2026 : code du repo, build de prod, dépôts GitHub (@Matteixou),
+> sites clients en ligne, ancien portfolio déployé, et extraits publics du profil LinkedIn
+> (le profil lui-même est bloqué à la lecture automatique → voir section 0).
+>
+> Légende : **P0** bloquant avant publication · **P1** mise à jour "ce que je fais aujourd'hui" · **P2** conversion
+> · **P3** SEO / légal / confiance · **P4** perf & accessibilité · **P5** dette technique · **P6** hors repo.
+> Chaque tâche indique *pourquoi*, *où*, et le *critère de "fait"*.
+
+> **15/10/2026 — refonte « appartement » :** tout le code a été supprimé puis réécrit (sauvegarde : `../_sauvegarde-avant-appart-2026-10-15/`). Deviennent sans objet : les faux témoignages (P0), le nettoyage de `About.tsx` / `skills.ts` (P1), le code mort, les dépendances 3D / GSAP / Lenis et `tailwind.config.ts` (P5). Le reste (infos à confirmer, déploiement, commit, année des projets, mentions légales) reste d'actualité.
+
+---
+
+## 0. Infos à confirmer (LinkedIn non lisible automatiquement)
+
+Les extraits publics de LinkedIn se contredisent sur certains points. Remplir ici avant d'attaquer la P1.
+
+- [ ] **Formation exacte en cours** — les extraits disent tantôt *"Bachelor Développement Web & Applications (2e année)"*, tantôt *"Bachelor Cybersécurité & Ethical Hacking (2e année, major de promo)"*, toujours à l'EFREI. Le repo contient actuellement *"Cycle Ingénieur 2023 → 2027"*, ce qui ne correspond à aucune des deux versions.
+  → Intitulé : ________ · Année actuelle : ____ · Date de diplôme prévue : ____
+- [ ] **Situation actuelle (oct. 2026)** — LinkedIn parlait d'une recherche d'alternance pour septembre 2026. Alternance trouvée ? Entreprise / poste / dates : ________. Le repo GitHub `J2---CSS3-fondamental...` ("Socle J-2", sept. 2026) ressemble à un cursus de formation front-end : lequel ?
+- [ ] **Leroy Merlin** — le titre de la page LinkedIn est *"Matthieu Feracho - Leroy Merlin"*. L'ancien portfolio indiquait *"2022–2024, logistique & analyse de données"*. Toujours en poste ? Rôle exact : ________.
+- [ ] **Stage Ronron-imprint (2024)** — e-commerce full-stack avec panier (d'après l'ancien portfolio). À afficher sur le site ? Lien démo / repo : ________.
+- [ ] **Statut juridique freelance** — micro-entreprise déclarée ? SIRET : ________. Nécessaire pour les mentions légales et pour facturer (voir P3).
+- [x] **Positionnement du site** — *tranché le 15/10/2026 : Matthieu est co-fondateur de Krylos (agence web, Villejuif, https://krylos.fr). L'offre freelance est retirée du site ; les demandes de projet partent vers krylos.fr. Page = Hero, Krylos, Réalisations, Contact. Les tâches P2 « conversion » liées aux devis, tarifs et FAQ sont obsolètes.*
+- [ ] **Stream** — horaires « tous les week-ends, 21 h – minuit » compris comme samedi et dimanche (le voyant ON AIR et le « prochain live » en dépendent : `data/stream.ts`). Contenus (Valorant, Fortnite, Apex Legends, dev en live) repris de l'ancien portfolio : toujours d'actualité ?
+- [ ] **Selfie d'origine** — `public/images/me.jpg` (1,8 Mo, fond de salle de bain) n'est plus utilisé mais serait publié tel quel : le retirer de `public/` si tu ne veux pas qu'il soit en ligne.
+- [x] **Musique sur la platine** — *fait le 15/10/2026 : Coldplay, Alex Warren, Alan Walker et Tayc (identifiants Spotify vérifiés) dans `data/musique.ts`.* Optionnel : une playlist perso, à coller dans `playlist` (elle passe en premier disque).
+- [ ] **Statut Twitch réel** — créer une application sur https://dev.twitch.tv/console et renseigner `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET` (local + Vercel). Sans ça, le voyant ON AIR suit les horaires du week-end.
+- [ ] **CV PDF** — la visite express (`/en-bref`) s'enregistre déjà en PDF ; si tu as un vrai CV, le déposer dans `public/` et je le relie depuis la fiche.
+- [ ] **Livre d'or** — créer une base Upstash Redis gratuite (ou l'intégration Upstash de Vercel) et générer `LIVRE_DOR_SECRET` (`openssl rand -hex 32`), en local et sur Vercel. Sans ça, en production, le frigo affiche « ouvre très bientôt ». Voir le README.
+- [ ] **Volley** — nom de l'asso affiché « Efrei Volley » (d'après le logo et @efrei.volleyball) ; « matchs inter-écoles et tournois » repris de l'ancien portfolio : à confirmer. Logo d'origine `public/images/logoEfreiVolley.png` (239 Ko) inutilisé, la version web est `logo-efrei-volley.webp`.
+- [ ] **Nom de domaine** — `matthieuferacho.fr` / `.dev` / autre : ________ (sert aussi d'expéditeur vérifié Resend).
+- [ ] **Photo pro** et **CV PDF à jour** — à fournir dans `public/` (références `avatarUrl` / `resumeUrl` dans `data/socials.ts` pointent vers des fichiers absents).
+
+---
+
+## 1. P0 — Bloquant avant toute mise en ligne
+
+- [ ] **Retirer les faux témoignages affichés** — `data/testimonials.ts` contient `"[À REMPLACER] Colle ici l'avis réel…"` et la section est rendue dans `app/page.tsx`. Un visiteur voit ce texte.
+  → *Fait quand* : soit 2 avis réels (texte + accord écrit du client) sont saisis, soit `<Testimonials />` est retiré de `page.tsx` en attendant.
+- [x] **Corriger l'écran de chargement "mathsuo"** *(fait 15/10 : la lampe s'allume puis affiche « Matthieu Feracho », 700 ms, une fois par session)* — `components/LoadingScreen.tsx` affiche le pseudo Twitch, pas le nom pro. Incohérent avec `<MTH/>` et "Matthieu Feracho".
+  → Afficher le nom / logo, ramener la durée de 2 200 ms à ≤ 600 ms (ou supprimer), et ne l'afficher qu'à la première visite (`sessionStorage`).
+- [x] **Réduire le délai d'apparition du Hero** *(fait 08/10 : entrées en CSS pur `.reveal`, délais 0,1–0,8 s, header idem)* — `Hero.tsx` et `Header.tsx` démarrent leurs animations à 2,5 – 3,4 s (après le loader). Le titre principal n'est lisible qu'après ~5 s : mauvais pour la conversion et le LCP.
+  → Délais ≤ 0,3 s une fois le loader raccourci.
+- [ ] **Commiter et sauvegarder le travail** — un seul commit ("Initial commit from Create Next App"), aucun remote, tout le portfolio est non versionné. Risque de perte totale.
+  → `git add -A && git commit`, créer le remote GitHub (nouveau repo ou remplacer `Matteixou/portfolio`), push. Vérifier que `.env.local` reste ignoré (c'est le cas via `.env*`).
+- [ ] **Déployer cette version à la place de l'ancienne** — `https://portfolio-matthieu-feracho.vercel.app` sert encore l'ancien portfolio "étudiant / content creator" (projets Ronron, Codapp, placeholder `const role = ""`). Les recruteurs et clients tombent dessus.
+  → Déployer ce repo sur Vercel, renseigner `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` dans les variables d'environnement Vercel, tester un envoi réel du formulaire.
+- [ ] **Vérifier l'année des réalisations** — `data/projects.ts` indique `year: "2025"` pour les deux sites, mais les dépôts GitHub ont été créés en mai et juin 2026 et les sites affichent © 2026.
+  → Corriger en `"2026"` si confirmé.
+
+---
+
+## 2. P1 — Mettre le portfolio en phase avec le profil réel
+
+- [ ] **Réécrire `data/timeline.ts`** — contenu actuel faux ou périmé : "Cycle Ingénieur Informatique 2023 →", "Stage / Alternance 2026 — en recherche active", "Premiers projets web 2023".
+  → Nouvelle timeline (du plus récent au plus ancien) : situation 2026 (alternance / formation, selon section 0) · 2026 sites Django Barber et Alexis Saucede (freelance) · Bachelor EFREI (intitulé exact, dates) · 2024 stage Ronron-imprint · 2022–2024 Leroy Merlin.
+- [ ] **Nettoyer `components/sections/About.tsx`** — affiche "Cycle Ingénieur 2023 → 2027", stat "2027 diplôme", "20+ projets", et une intro gaming/stream. Non rendu aujourd'hui mais toujours dans le repo.
+  → Soit supprimer le fichier, soit le réécrire en section *À propos* orientée confiance client (photo, EFREI, expérience, 2 sites livrés, "basé à Villejuif / Val-de-Marne") et l'ajouter à `page.tsx` entre *Pourquoi moi* et *Témoignages*.
+- [ ] **Aligner le sous-titre du Hero** — `Hero.tsx` : "Étudiant en développement web, avec des projets réels déjà livrés". À préciser avec la formation réelle (ex. "Étudiant en Bachelor à l'EFREI") et, si pertinent, la dispo alternance.
+- [ ] **Ajouter un bloc discret "Recruteurs / alternance"** — si la recherche d'alternance est toujours d'actualité : une ligne dans *À propos* ou le footer ("Également ouvert à une alternance développement web — CV") + bouton téléchargement CV. Sinon, retirer toute mention de recherche.
+- [ ] **Enrichir les réalisations avec les projets GitHub pertinents** — seuls 2 sites sont montrés. Candidats : **Codapp** (assistant dev IA multi-agents, Node/Express, RAG, CLI + extension VS Code), **ThreeCraft** (moteur voxel Three.js), **Symphony-Siteweb** (Symfony, auth + CRUD), **Mini-mvc-shop** (PHP MVC).
+  → Ajouter une sous-section "Projets techniques" (grille compacte, lien GitHub) sous les sites clients, ou une page `/projets`. Garder les sites clients en premier pour l'audience commerce.
+- [ ] **Compléter les fiches des sites clients** — d'après GitHub : Alexis Saucede = React + Tailwind + Three.js + Framer Motion, formulaire, avis Google, animations 3D ; Django Barber = React + Vite + GSAP + Tailwind, réservation en ligne, galerie, tarifs.
+  → Ajouter dans `highlights` ce qui compte pour un commerçant (réservation en ligne, avis Google, délai de livraison, mobile) et mettre à jour les captures (les actuelles sont de juin 2026).
+- [ ] **Mettre à jour `data/skills.ts`** — liste générique (MongoDB, Express…) héritée de l'ancien portfolio. Non rendue aujourd'hui.
+  → Supprimer, ou réduire aux technos réellement utilisées sur les projets (React, Next.js, TypeScript, Tailwind, Three.js, GSAP, Framer Motion, Node, PHP/Symfony, Docker, Git, Figma).
+- [ ] **Renseigner WhatsApp** — `personalInfo.whatsapp` est vide. Pour des coiffeurs / artisans, WhatsApp est souvent le canal n° 1.
+  → Renseigner le numéro (format international sans +) ou décider de ne pas l'exposer.
+- [ ] **Décider du sort d'Instagram** — `@matthieu.frch` (compte perso) est listé dans les canaux de contact d'un site pro. Garder seulement si le contenu est pro, sinon retirer de `contactChannels`.
+
+---
+
+## 3. P2 — Conversion & contenu business
+
+- [ ] **Ajouter une section FAQ** — `TARIFS.md` contient déjà 3 Q/R ("Pourquoi moins cher qu'une agence ?", "Prix définitif ?", "Frais cachés ?"). Absentes du site.
+  → Section accordéon avant *Contact* + 2-3 questions supplémentaires (délais, hébergement, qui écrit les textes). Bonus SEO avec le JSON-LD `FAQPage` (voir P3).
+- [ ] **Ajouter "Tarifs" et "Maintenance" à la navigation** — `Header.tsx` ne liste que Services / Réalisations / Process / Contact. Les visiteurs cherchent d'abord les prix.
+- [ ] **Préciser la zone géographique** — "Île-de-France" partout. Pour le SEO local, nommer la ville (Villejuif / Val-de-Marne 94) dans le Hero, le footer et les métadonnées. Les deux clients sont à Villejuif et Saint-Mandé : s'en servir ("J'accompagne les commerces du 94").
+- [ ] **Ajouter des chiffres de preuve** — "2 sites livrés en 2026", "réponse sous 24 h", "mise en ligne en 1 à 3 semaines". Dans le Hero ou sous les pilules.
+- [ ] **CTA secondaire "Audit gratuit de votre site"** — pour l'offre *Refonte*, proposer un mini-audit gratuit (formulaire avec champ URL). Lead magnet simple.
+- [ ] **Page / ancre dédiée aux tarifs détaillés** — reprendre le tableau comparatif de `TARIFS.md` (8 lignes) dans la section Services, ou une page `/tarifs` partageable dans les devis.
+- [ ] **Mesurer** — aucun analytics. Ajouter Vercel Analytics ou Umami / Plausible (sans cookies → pas de bandeau) et tracer les clics sur "Demander un devis" et les envois de formulaire.
+
+---
+
+## 4. P3 — SEO, légal, confiance
+
+- [ ] **Mentions légales** — obligatoires en France pour un site professionnel (nom, adresse ou domiciliation, SIRET, email, hébergeur Vercel). Aucune page n'existe.
+  → Créer `app/mentions-legales/page.tsx` + lien footer. Dépend du SIRET (section 0).
+- [ ] **Politique de confidentialité / RGPD** — le formulaire collecte nom, email, message via Resend sans information ni consentement.
+  → Page `app/confidentialite/page.tsx` (finalité, durée de conservation, droits, sous-traitant Resend) + case à cocher ou phrase sous le formulaire dans `Contact.tsx`.
+  → Y inclure le livre d'or : pseudo, mot et date conservés (Upstash), adresse IP seulement hachée et gardée 1 h pour l'anti-spam, retrait d'un post-it sur simple demande.
+- [x] **Métadonnées complètes** *(fait 08/10 : `metadataBase` via `NEXT_PUBLIC_SITE_URL` / `VERCEL_PROJECT_PRODUCTION_URL`, canonical, OG image générée, twitter card, robots)* — `app/layout.tsx` : pas de `metadataBase`, pas d'image OpenGraph, pas de `twitter`, pas de `alternates.canonical`.
+  → Ajouter `metadataBase` (domaine), générer `app/opengraph-image.tsx` (1200×630 avec nom + promesse), `twitter: { card: "summary_large_image" }`.
+- [x] **`robots.ts` et `sitemap.ts`** *(fait 08/10)* — absents. Créer `app/robots.ts` et `app/sitemap.ts` (page d'accueil + pages légales + éventuelles pages projets).
+- [x] **Favicon et icônes** *(fait 08/10 : `app/icon.tsx` + `app/apple-icon.tsx` générés, lettre « M » sur dégradé ; à remplacer par un vrai logo si souhaité)* — `app/favicon.ico` est celui par défaut de create-next-app.
+  → Remplacer par un favicon `<MTH/>` ou initiales, ajouter `app/icon.png` (512) et `apple-icon.png`.
+- [x] **Données structurées JSON-LD** *(fait 08/10 : `components/seo/JsonLd.tsx` — Person, ProfessionalService avec offres, WebSite ; `FAQPage` à ajouter avec la FAQ)* — aucune. Ajouter `Person` (+ `alumniOf` EFREI) et `ProfessionalService` / `LocalBusiness` (zone : Villejuif, Val-de-Marne, Île-de-France ; `priceRange`), plus `FAQPage` si la FAQ est ajoutée.
+- [ ] **Titre / description orientés local** — `title` actuel : "Matthieu Feracho — Création de sites web pour commerces locaux". Tester une variante avec la ville : "Création de site internet pour commerces & artisans — Villejuif / Val-de-Marne (94)".
+- [ ] **Fiche Google Business Profile** — créer une fiche "Développeur web freelance" (zone de service) pour apparaître dans Google Maps sur "création site internet Villejuif". Hors code mais gros levier local.
+- [ ] **Avis clients réels** — demander à Alexis Saucede et à Django Barber un avis écrit (et idéalement un avis Google sur la fiche ci-dessus). Prérequis de la tâche P0 témoignages.
+
+---
+
+## 5. P4 — Performance & accessibilité
+
+- [x] **Optimiser les captures d'écran** *(fait 08/10 : WebP 45 Ko et 32 Ko dans `public/projects/`, `next/image` ; les PNG d'origine restent dans `public/` et peuvent être supprimés)* — `public/Alexissaucede.png` = 1,28 Mo, `public/Django.png` = 577 Ko, servies via `<img>` brut dans `Projects.tsx`.
+  → Convertir en WebP/AVIF (~100-150 Ko), passer par `next/image` avec `sizes` et `loading="lazy"`, retirer le commentaire `eslint-disable no-img-element`.
+- [x] **Respecter `prefers-reduced-motion`** *(fait 08/10 : `MotionConfig reducedMotion="user"`, Lenis désactivé, media query CSS, effets non montés)* — aucune prise en charge. Les animations Framer Motion, le `ParticleField`, le `Spotlight` et le marquee tournent en permanence.
+  → Utiliser `useReducedMotion()` de Framer Motion et `@media (prefers-reduced-motion: reduce)` dans `globals.css` ; désactiver `ParticleField` dans ce cas.
+- [x] **Curseur personnalisé : limiter aux appareils à souris** *(fait 08/10 : `components/effects/ClientEffects.tsx`)* — `globals.css` impose `cursor: none` à tout le `body` et `CustomCursor` est monté partout. Sur tactile c'est inutile, et si le JS échoue l'utilisateur n'a plus de curseur.
+  → Envelopper dans `@media (hover: hover) and (pointer: fine)` et ne monter `CustomCursor` / `ParticleField` que dans ce cas.
+- [x] **Accessibilité du formulaire** *(fait 08/10)* — `Contact.tsx` : aucun `<label htmlFor>` associé à un `id`, pas d'`autocomplete` (`name`, `email`), pas d'`aria-invalid` ; message d'erreur ok (`role="alert"`).
+- [x] **Contrastes** *(fait 08/10 : opacités remontées, minimum `text-white/50`)* — beaucoup de textes en `text-white/30` à `/45` sur fond `#020206` (ratio < 4,5:1). Remonter les textes informatifs à ≥ `/60` et réserver `/30` au décoratif.
+- [x] **Navigation clavier** *(fait 08/10 : skip link, focus visible, `aria-expanded` + `inert`, liens externes sécurisés ; reste `aria-current`)* — ajouter un lien "Aller au contenu", `aria-expanded` sur le bouton hamburger, `aria-current` sur l'ancre active ; vérifier que `MagneticButton` avec `href` externe a `target="_blank" rel="noopener"`.
+- [x] **Lighthouse** — mesuré le 08/10 sur le build de prod (`next start`, Chrome headless, throttling simulé) :
+
+  | | Perf | A11y | Bonnes pratiques | SEO | LCP | FCP |
+  |---|:---:|:---:|:---:|:---:|:---:|:---:|
+  | Mobile avant | 81 | 96 | 100 | 100 | 4,0 s | 2,1 s |
+  | Mobile après | 85–87 | 100 | 100 | 100 | 3,2 s | 1,9 s |
+  | Desktop après | 99 | 100 | 100 | 100 | 0,8 s | 0,3 s |
+
+  Reproduire : `npm run build && npm run start`, puis `npx lighthouse http://localhost:3000 --view` (Chrome installé requis).
+- [ ] **Comprendre le blocage de première peinture avec JS actif** — constat du 08/10 : sans JavaScript la page est peinte à 0,23 s ; avec JS, la première peinture observée arrive à ~2,2 s (headless) / ~1,5 s (Chrome fenêtré), alors que le thread principal, le GPU et le réseau sont inactifs entre 0,45 s et 1,2 s. Le compositeur ne produit pas de frame pendant ~1 s. Ce n'est ni le loader ni Lenis (testés en les retirant : aucun gain), ni les polices seules (−0,6 s sans polices). C'est la seule chose qui sépare le mobile de ≥ 90.
+  → Pistes : tester sur l'URL Vercel avec PageSpeed Insights (données réelles) ; essayer de retirer temporairement Framer Motion du Hero/Header (seul JS restant au-dessus de la ligne de flottaison) ; vérifier avec un Chrome récent en mode fenêtré + onglet Performance.
+
+---
+
+## 6. P5 — Dette technique & hygiène du repo
+
+- [ ] **Supprimer le code mort de l'ancien portfolio "gamer"** — jamais importés : `sections/About.tsx` (sauf si réécrit), `Timeline.tsx`, `Gaming.tsx`, `Streaming.tsx`, `Volleyball.tsx`, `Skills.tsx`, `three/KeyboardScene.tsx`, `three/SkillKeyboard.tsx`, `ui/TiltCard.tsx`, `effects/NoiseBanner.tsx`, `lib/utils.ts` (`applyFilmGrain`, `hexToRgb` si inutilisés).
+  → Si une version "perso" doit survivre, la déplacer sur une route `/perso` plutôt que la laisser dans le bundle de dev.
+- [ ] **Retirer les dépendances inutilisées** — `three`, `@types/three`, `@react-three/fiber`, `@react-three/drei`, `gsap`, `@gsap/react` ne sont utilisés que par `SkillKeyboard.tsx` (non monté). Ils alourdissent `node_modules` et les installs.
+- [ ] **Supprimer `tailwind.config.ts`** — Tailwind v4 est configuré en CSS (`@theme` dans `globals.css`). Le fichier JS duplique la palette et n'est pas chargé. Une seule source de vérité.
+- [x] **Corriger l'avertissement de build Turbopack** *(fait 08/10 : `turbopack.root` + `outputFileTracingRoot`, en-têtes de sécurité ajoutés au passage)* — Next détecte `C:\Users\matth\Documents\Projet\bun.lock` et choisit le mauvais root.
+  → Dans `next.config.ts` : `turbopack: { root: __dirname }` (ou supprimer le `bun.lock` parent s'il est orphelin).
+- [x] **Ajouter ESLint** *(fait 08/10 : `eslint.config.mjs`, `npm run lint` ; `components/three/**` ignoré car non monté et incompatible React Compiler)* — pas de script `lint` ni de config. `npm i -D eslint eslint-config-next`, script `"lint": "next lint"` (ou `eslint .` selon la doc Next 16 dans `node_modules/next/dist/docs/`).
+- [x] **Protéger le formulaire contre le spam** *(fait 08/10 : honeypot `website` + limites de longueur ; Turnstile / limitation par IP restent optionnels)* — `app/api/contact/route.ts` n'a ni honeypot, ni limitation de débit, ni captcha. Un bot peut vider le quota Resend.
+  → Champ honeypot caché + Cloudflare Turnstile (gratuit) ou limitation par IP (Upstash / en mémoire).
+- [ ] **Mettre à jour `README.md`** *(08/10 : commandes `lint` / `typecheck` ajoutées ; la structure décrite reste périmée)* — décrit encore les sections About / Skills / Timeline, ignore Services / Maintenance / Process / WhyMe / Testimonials, l'API `/api/contact` et la config Resend (`.env.example`).
+- [x] **Alléger `app/layout.tsx`** *(fait 08/10 : curseur + particules via `next/dynamic` dans `ClientEffects`)* — `LoadingScreen`, `BackgroundGrid`, `CustomCursor`, `ParticleField` (via `SmoothScrollProvider`) sont tous des composants client montés globalement. Charger `ParticleField` et `CustomCursor` avec `next/dynamic` (`ssr: false`).
+- [ ] **Mettre `CLAUDE.md` à jour** — pointe sur `AGENTS.md` (règles Next 16). Ajouter 3 lignes : commandes, où éditer le contenu (`data/`), règle "jamais d'avis inventé".
+
+---
+
+## 7. P6 — Hors repo (sites clients, GitHub, LinkedIn)
+
+- [ ] **Crédit "Site réalisé par Matthieu Feracho" sur les sites clients** — ni `alexissaucede.com` ni `django-barber.vercel.app` ne mentionnent le développeur. C'est le premier canal d'acquisition gratuit (et un backlink).
+  → Ajouter un lien discret dans le footer des deux sites, avec l'accord des clients.
+- [ ] **Nom de domaine pour Django Barber** — le site tourne sur `django-barber.vercel.app`. Proposer au client un domaine (`django-barber.fr`) : plus crédible dans le portfolio et upsell naturel (maintenance).
+- [ ] **Profil GitHub** — bio actuelle : "Développeur passionné par le web…". Ajouter l'offre freelance et le lien vers le portfolio ; épingler Alexissaucede, Django-Barber, Codapp, ThreeCraft ; archiver `Lightouse`, `Agence-Voyage`, `Pharmacie` (sans description).
+- [ ] **LinkedIn** — une fois le site déployé : mettre l'URL du portfolio dans la rubrique Coordonnées + section "Sélection", ajouter les deux sites comme *Projets*, et harmoniser le titre (formation exacte + "Développeur web freelance — sites pour commerces locaux").
+- [ ] **Signature email** — nom, titre, lien portfolio, téléphone/WhatsApp. Utilisée dans les devis.
+
+---
+
+## Suivi
+
+| Date | Fait | Note |
+|------|------|------|
+| 2026-10-07 | Audit initial, création de ce fichier | Build de prod OK (`next build` exit 0), `tsc --noEmit` OK |
+| 2026-10-15 | Refonte visuelle « salon au coucher du soleil » d'après la photo de référence de Matthieu : nouveau thème (`globals.css`), polices Fraunces + Geist, décor SVG (`components/decor/`), halo de lampe et poussière dorée (`components/effects/`), nouvelle section `Atelier.tsx` (technologies en mur de cadres), Krylos en pile de livres, réalisations encadrées, formulaire sur papier ligné, tapis berbère en pied de page, image OG et icônes recolorées. Sauvegarde de la version néon : `../_sauvegarde-avant-cocooning-2026-10-15/` | Lighthouse mobile 87 / 100 / 100 / 100 (LCP 3,4 s, coût de la police Fraunces), ordinateur 99 / 100 / 100 / 100 |
+| 2026-10-15 | Repositionnement co-fondateur de Krylos : nouvelle section `Krylos.tsx` + `data/krylos.ts` (textes repris de krylos.fr), Hero / Header / Réalisations / Contact / Footer / SEO / JSON-LD / image OG réécrits ; Services, Maintenance, Process, WhyMe et Testimonials démontés de `page.tsx` (fichiers conservés). Cahier des charges des maquettes mis à jour, direction visuelle cocooning marron / beige / crème | Lighthouse mobile 90 / 100 / 100 / 100 ; `TARIFS.md` ne sert plus au site |
+| 2026-10-08 | Passe Performance / SEO / Bonnes pratiques / Accessibilité (16 tâches cochées ci-dessus) | Mobile 81→86, A11y 96→100, desktop 99 ; favicon Next et SVG de démo supprimés ; `npm run lint` + `npm run typecheck` ajoutés ; `.env.example` : `NEXT_PUBLIC_SITE_URL` |
+| 2026-10-15 | **Refonte complète « l'appartement »** : le site devient un salon dessiné en SVG (d'après la photo de Matthieu) où chaque objet ouvre un panneau — télé = réalisations (zapping), affiche = Krylos, mur de cadres = technologies, portrait = à propos, lettre = contact. Caméra qui zoome sur l'objet, mode nuit (lune, tour Eiffel illuminée), lampes / bougies / chat interactifs, parallaxe, navigation par ancres (#contact…), repli sans JavaScript. Dépendances retirées : three, r3f, gsap, lenis, framer-motion | Lighthouse mobile 86 / 100 / 100 / 100 (LCP simulé 4,1 s), ordinateur 99 / 100 / 100 / 100 ; CPU au repos divisé par 5 après optimisation des animations |
+| 2026-10-15 | **Fluidité + studio de stream** : scène reconstruite en calques (décor fixe en images générées par `npm run salon`, objets HTML, animations transform/opacity sur la carte graphique, survol et parallaxe sans re-rendu React, pièces hors écran en pause). Nouvelle pièce à droite : le studio (néon « mathsuo », écrans avec l'état réel du créneau, chat qui défile, PC RGB, horaires), panneau `#stream`. Selfie de Matthieu dans le cadre du salon et le panneau À propos. Tour Eiffel masquée derrière ce qui passe devant la vitre | Souris : 3,5 s de calcul pour 3 s de mouvement → ~1,1 s, 12 images ratées → 0 ; survol du plan 1,6 s → 0,6 s ; fermeture d'un panneau sans à-coup |
+| 2026-10-15 | **Gymnase + coin musique** : 3e pièce à gauche du salon, aux couleurs d'Efrei Volley (logo, terrain bleu, écharpes, drapeaux, « Allez l'Efrei ! », projecteurs qui balaient la nuit), petit joueur qui saute et smashe (tout seul et au clic, score au tableau), panneau `#volley`. Studio : guitare et clavier, panneau `#musique` (8 ans de conservatoire à l'EMA de Vitry-sur-Seine, accord et arpège synthétisés, emplacement playlist). Correctifs : barre du plan qui bloquait les flèches, re-défilement parasite pendant le zoom, CSS de dev périmé | Changer de pièce : 0 image ratée ; arrivée toujours sur le salon (décalage CSS avant JavaScript) |
+| 2026-10-15 | **L'appartement vit à l'heure de Villejuif** : météo réelle (Open-Meteo, cache 10 min) sur les fenêtres du salon et du gymnase (pluie, neige, orage avec éclairs, ciel gris), température dans l'interrupteur, nuit automatique de 20 h à 7 h. Platine vinyle sur un meuble à vinyles (disque qui tourne, bras qui se pose, mini-lecteur Spotify ou boucle lo-fi synthétisée). Cordes de guitare et clavier jouables dans la scène. Livre d'or : frigo rétro dans le studio, post-its modérés par email (liens signés + page de confirmation), anti-spam, panneau `#livre-dor` | Parcours testé : dépôt → lien signé → confirmation → publication → frigo ; faux jeton et jeton croisé refusés ; 4e post-it de l'heure refusé ; production sans Upstash → « ouvre très bientôt ». Typecheck, lint et build OK |
+| 2026-10-15 | **Les disques de Matthieu sur la platine** : Coldplay, Alex Warren (« Emerald Eyes »), Alan Walker, Tayc via le lecteur Spotify (titres phares, ou un titre précis). Choix du disque dans le mini-lecteur (repliable, la musique continue) et dans le panneau Musique (« Ce que j'écoute », vinyles qui tournent) ; la platine fait lecture / pause ; boucle lo-fi en secours si Spotify est bloqué | Testé : lecture, changement d'artiste, pause par la platine, repli lo-fi avec Spotify bloqué, mobile. Extraits de 30 s pour les visiteurs non connectés à Spotify (limite de Spotify) |
+| 2026-10-16 | **Twitch en vrai, visite express, saisons** : statut du live via l'API Twitch (`/api/twitch`, cache 1 min ; écrans, ON AIR, panneau, pastille « En live », point rouge dans le plan ; repli sur les horaires sans clés). Page `/en-bref` : le portfolio sur une fiche (profil, réalisations, outils, Krylos, à côté, contact), imprimable en CV, liée depuis le mot d'accueil et le sitemap. Calendrier des saisons : Halloween, Noël (image `meubles-noel` avec sapin et cadeaux), Nouvel An, hiver, printemps, été, automne ; tenues du chat | Au repos, même cadence avec ou sans décor de saison (0 image ratée, Noël de nuit compris). Typecheck, lint et build OK |
+| 2026-10-16 | **Calendrier complet, préparé à l'avance** : saison de fond (hiver, printemps, été, automne) + temps forts qui s'activent seuls : Nouvel An, galette des rois, Saint-Valentin, Pâques (date calculée, chasse aux 5 œufs), 1er mai, Fête de la musique, 14 juillet, rentrée, Halloween, Noël. Nouveaux objets : table basse (galette, roses, lapin en chocolat, muguet, cahiers), sol (ballons cœurs, cartable, panier), fanions, drapeau au balcon, notes de musique dehors, six nouvelles tenues pour le chat | Dates vérifiées (Pâques 2026 → 5 avr., 2027 → 28 mars, 2028 → 16 avr.) ; chasse aux œufs testée au clic ; typecheck, lint et build OK |
+| 2026-10-16 | **Secrets, ambiance sonore, horloge** : 8 secrets (étoile filante, tour Eiffel qui scintille, chat qui suit la souris des yeux, carillon, mode disco par code Konami ou interrupteur, smash ×5 avec confettis, gamme au clavier, néon détraqué), compteur et indices sous l'interrupteur, progression mémorisée. Ambiance synthétisée (pluie/orage selon la vraie météo, ville la nuit, voitures, bougies, oiseaux), bouton pour couper le son. Horloge murale à l'heure de Paris | Les 8 secrets testés au clic et au clavier (ordinateur et mobile) ; typecheck, lint et build OK |
+| 2026-10-16 | **Logo Krylos animé** : logo officiel (krylos.fr, 512 px) découpé automatiquement en 4 pétales. Affiche du salon : pétales qui respirent, s'écartent en tournant au survol, caisson lumineux la nuit. Panneau Krylos : assemblage à l'ouverture. Visite express : logo à côté de l'agence | Testé jour / nuit / survol / ouverture du panneau ; typecheck, lint et build OK |
+| 2026-10-16 | **Optimisation de la fluidité** (mesurée, processeur ralenti ×4) : boucles d'animation courtes déroulées en boucles longues (le navigateur ne se réveille plus à chaque battement d'aile) ; pièces voisines réellement en pause (la détection les croyait visibles) ; panneaux fermés en pause ; plus de `inert` sur la scène (aria-hidden + piège à focus) ; attribut `data-cadre` pour ne plus recalculer toute la scène ; parallaxe et yeux du chat sans lecture de mise en page à chaque image ; pièces et repères mémorisés ; statut Twitch inchangé = pas de redessin | A/B mêmes conditions : repos de nuit 1 777 → 318 ms de travail (−82 %), de jour −36 % et +41 % d'images affichées ; à-coup souris 124 → 21 ms ; plus longue tâche à l'ouverture d'un panneau −40 %, à la fermeture −50 à −69 % ; recalcul de style à l'ouverture 1 471 → 93 éléments. Reste : une pause au début du zoom de la caméra (voir ligne suivante) |
+| 2026-10-16 | **Enquête sur la pause au début du zoom** : c'est la carte graphique (pas le code) qui, à la première ouverture, compile ses programmes de dessin et redessine la scène à 2,2× (dégradés surtout). Profil Chrome conservé : 29 ms perdus à la 1re ouverture après relance, puis 0. Quatre pistes testées en A/B à froid (8 passages) : résolution figée pendant le zoom, images du décor isolées, halos figés, calques de parallaxe gardés → aucun gain significatif, toutes retirées | Pas de changement de code. Correction : le navigateur de test utilise bien la vraie carte graphique (AMD Radeon intégrée) |
+| 2026-10-16 | **Animation d'arrivée** : le palier devant la porte de l'appartement (applique qui s'allume, paillasson, plaque, post-it, décor de saison), la poignée s'abaisse, la porte s'ouvre en 3D sur le vrai salon, puis on entre (le palier grandit et s'efface). Sonnette au clic ou à une touche. Une fois par visite ; sautée pour un lien direct, sans JavaScript ou en mouvement réduit | Ouverture + entrée : 0 image ratée sur 4 passages (enchaînement en CSS, palier à peine translucide pour préparer le salon dessous) ; testé jour, nuit, Noël, Halloween, mobile, et chaque cas où l'entrée est sautée |
+| 2026-10-16 | **Fluidité, 2e passe : les mouvements de caméra** (écran à 120 Hz : 8 ms par image). Trouvé en traçant ce qui réveille le navigateur pendant le zoom : (1) les animations **en pause** (pièces hors écran, nuit, météo, lampes, lueurs) étaient remises en attente à chaque image tant que la caméra bougeait → retirées (`animation-name: none`) au lieu d'être mises en pause ; (2) en refermant, l'accroche des pièces se réactivait pendant le dézoom et faisait re-défiler le plateau à chaque image → `data-zoom` n'est retiré qu'une fois la caméra posée ; (3) la parallaxe continuait de bouger pendant le zoom → arrêt net à l'ouverture ; (4) le zoom réveillait le studio voisin en plein mouvement → `data-visible` figé pendant la visite | A/B alterné ancienne/nouvelle version (6 passages, 1,5×) : travail du processeur à l'ouverture 538 → 213 ms (−60 %), à la fermeture 536 → 160 ms (−70 %) ; carte graphique −24 % à l'ouverture ; images ratées à l'ouverture 19 → 12 (profil froid), 13 → 9 (profil chaud) ; fermeture et changement de pièce inchangés (dans le bruit de mesure). Les gros à-coups restants viennent de la compilation des programmes de dessin de la carte graphique sur un profil neuf (une seule fois par navigateur) |
+| 2026-10-16 | **Fluidité, 3e passe : se déplacer** (mesuré aux réglages de l'écran de Matthieu : 2880×1620 à 200 % → 1440×~700 points, densité 2, 120 Hz). La pièce qu'on quitte n'est éteinte qu'une fois le défilement posé (avant : recalcul de ~700 éléments en plein glissé) ; la pièce d'arrivée est réveillée avant le départ avec les flèches et le plan ; plus de rebond au bout de l'appartement (il montrait le fond sombre de la page : « bandes noires ») | A/B alterné, 4 passages, flèches et pavé tactile : ~1 image ratée par déplacement → ~0,2. Constats : le serveur de dev ajoute des tâches de 60-70 ms à l'ouverture/fermeture (prod : 9-22 ms) ; 1re visite (profil neuf) = 17-25 images ratées au premier déplacement (préparation de la carte graphique), ~1 ensuite |
+| 2026-10-17 | **Vrai envoi de test + état de la mise en ligne.** Envoi réel depuis le serveur local (version de production) : Resend accepte (200), l'adresse `matthieu94f@gmail.com` est bien celle du compte Resend. **Le site en ligne (portfolio-matthieu-feracho.vercel.app) est une ancienne version** déployée il y a ~25 jours : pas d'appartement, `/api/contact` et `/en-bref` en 404. Le dépôt git n'a que le commit initial de Create Next App et aucun dépôt distant | À faire pour la mise en ligne (avec validation de Matthieu) : commit, dépôt GitHub ou CLI Vercel relié au projet existant, variables d'environnement sur Vercel (`RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM`, `NEXT_PUBLIC_SITE_URL`, puis Twitch / Upstash / `LIVRE_DOR_SECRET`), puis un envoi de test depuis le site en ligne. `.env.local` est bien ignoré par git |
+| 2026-10-16 | **Vérification du formulaire de contact** (sans envoi réel). Correction : sans réseau, le visiteur voyait « Failed to fetch » → message en français | Navigateur (ordinateur + mobile, `/api/contact` intercepté) : 15/15 (champs obligatoires, email invalide bloqué, confirmation, erreur affichée sans perdre le texte, Tab reste dans le panneau). Route seule avec un faux Resend : 16/16 (anti-robots, longueurs, HTML du visiteur neutralisé, reply_to, pannes Resend → 502/500, sans clé → 502). Clé Resend valide (restreinte à l'envoi). Livre d'or : « ouvre très bientôt » tant qu'Upstash n'est pas configuré. Reste : un vrai envoi de test, et les variables sur Vercel |
+| 2026-10-16 | **Fluidité, 4e passe : le survol à la souris.** Chaque mouvement de souris fait refaire une image au navigateur, qui recalcule alors toutes les animations du décor : la parallaxe ne fixe plus qu'une destination ~12 fois/s (Web Animation sur la carte graphique) au lieu d'écrire 120 positions/s ; yeux du chat à 25 fois/s. **Qualité adaptative** (`qualite.ts`) : si les premiers gestes montrent un appareil qui décroche, mode léger pour la session (sans parallaxe, lueur floue, poussière, oiseaux…) ; `?leger=1` / `?leger=0` pour tester | A/B (×2, 1440×700, 4 passages) : travail du thread principal en balayant la souris 1 603 → 1 143 ms (−29 %), images refaites 365 → 255 ; survol d'un objet ~430 → ~160 ms de travail ; la lueur floue coûte encore ~1 image ratée par survol (0,1 sans). Pas de faux passage en léger sur le PC de Matthieu ; glissement de la parallaxe continu (aucun saut) |
+| 2026-10-16 | **L'arrivée : on remonte le couloir** avant d'ouvrir la porte (vue de loin → devant la porte en 1,7 s, quelques pas qui balancent puis se posent ; tapis de couloir et cadre ajoutés, palier dessiné plus large). La marche démarre à l'hydratation, la porte s'ouvre à la fin de la marche (`animationend`) | Film image par image : marche visible du début à la fin, porte aussi nette qu'avant à l'arrivée ; entrée complète 0 à 1 image ratée (comme avant) ; typecheck, lint et build OK |

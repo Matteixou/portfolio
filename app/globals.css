@@ -1,0 +1,1772 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════
+   « Chez Matthieu » — un portfolio qui se visite comme un appartement.
+   Palette tirée de la photo de référence : canapé bouclé crème, velours
+   olive, terracotta, lampes ambrées, ciel pêche et lavande.
+
+   Couples de texte validés (WCAG AA, ≥ 4,5:1) :
+   espresso / moka / cognac / brique / olive sur crème ou lin ;
+   crème sur brique, brique-foncé, olive, moka, espresso.
+   Terracotta, ambre, miel = décor uniquement.
+   ═══════════════════════════════════════════════════════════════════════ */
+@theme {
+  --color-creme: #f6efe4;
+  --color-lin: #ece1d0;
+  --color-sable: #dcc9ae;
+  --color-cognac: #8a5530;
+  --color-moka: #6a4b36;
+  --color-espresso: #3a281d;
+  --color-nuit: #1c140f;
+  --color-brique: #a3431f;
+  --color-brique-fonce: #8c381a;
+  --color-terracotta: #c2562f;
+  --color-olive: #59623a;
+  --color-ambre: #f2a24e;
+  --color-miel: #f7c987;
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-main: var(--font-caveat), "Segoe Print", "Bradley Hand", cursive;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, Consolas, monospace;
+
+  --shadow-papier: 0 1px 0 rgb(255 255 255 / 0.7) inset, 0 24px 60px -24px rgb(28 20 15 / 0.55), 0 6px 18px -8px rgb(28 20 15 / 0.3);
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--color-nuit);
+  color: var(--color-espresso);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--color-miel);
+  color: var(--color-espresso);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brique);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+/* les titres qui reçoivent le focus par programme (panneaux) n'ont pas de contour */
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+.lien-evitement {
+  position: fixed;
+  left: 16px;
+  top: -80px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--color-espresso);
+  color: var(--color-creme);
+  font-weight: 600;
+  transition: top 0.2s;
+}
+.lien-evitement:focus {
+  top: 16px;
+}
+
+/* ─── Papier : notes, panneaux, cartes ──────────────────────────────── */
+.papier {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(255 255 255 / 0.55), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgb(220 201 174 / 0.35), transparent 70%),
+    var(--color-creme);
+  box-shadow: var(--shadow-papier);
+}
+
+/* Boutons et étiquettes des panneaux */
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.35rem;
+  border-radius: 999px;
+  background: var(--color-brique);
+  color: var(--color-creme);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 14px 26px -14px rgb(163 67 31 / 0.8);
+  transition: background 0.2s ease, transform 0.25s ease;
+}
+.bouton:hover {
+  background: var(--color-brique-fonce);
+  transform: translateY(-1px);
+}
+/* violet de la plateforme de stream (crème dessus : 5,9:1) */
+.bouton.violet {
+  background: #6a3cc9;
+  box-shadow: 0 14px 26px -14px rgb(106 60 201 / 0.8);
+}
+.bouton.violet:hover {
+  background: #5a30ad;
+}
+.bouton-second {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.7rem 1.25rem;
+  border-radius: 999px;
+  border: 1.5px solid rgb(106 75 54 / 0.35);
+  color: var(--color-espresso);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.bouton-second:hover {
+  background: var(--color-lin);
+  border-color: var(--color-moka);
+}
+.puce {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--color-lin);
+  border: 1px solid var(--color-sable);
+  color: var(--color-moka);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.lien {
+  color: var(--color-cognac);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+.lien:hover {
+  color: var(--color-brique);
+}
+
+/* Le contenu d'un panneau arrive en douceur */
+.entree {
+  animation: entree 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes entree {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.papier-ligne {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    rgb(138 85 48 / 0.11) 31px,
+    rgb(138 85 48 / 0.11) 32px
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   La pièce
+
+   Performance : la scène est un empilement de calques. Le décor fixe est
+   fait d'images dessinées une seule fois ; tout ce qui bouge est un petit
+   calque animé uniquement en transform / opacity (pris en charge par la
+   carte graphique). Aucune animation ne force à redessiner la pièce.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Le plateau : plein écran. Sur un écran plus étroit que la pièce (mobile),
+   on se déplace dans l'appartement en glissant de gauche à droite. */
+.plateau {
+  position: fixed;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  /* pas de rebond au bout de l'appartement (pavé tactile, écran tactile) :
+     il étirait le décor et laissait voir le fond sombre de la page */
+  overscroll-behavior: none;
+}
+.plateau::-webkit-scrollbar {
+  display: none;
+}
+/* pendant une visite : on ne défile plus, et surtout pas d'accroche (le zoom
+   déplace les points d'accroche, le navigateur re-défilerait tout seul) */
+.plateau[data-zoom="true"] {
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+
+/* L'appartement : trois pièces côte à côte (gymnase, salon, studio).
+   Chaque pièce garde son ratio 16:10 et couvre l'écran ; on passe de
+   l'une à l'autre en défilant. La caméra (transform) bouge l'ensemble.
+   On arrive dans le salon : avant JavaScript, un décalage (margin-left)
+   le montre déjà, cadré comme sur mobile ; JavaScript le remplace ensuite
+   par un défilement équivalent (data-pret), sans saut à l'écran. */
+.appartement {
+  --piece-w: max(100vw, 160svh);
+  --piece-h: max(100svh, 62.5vw);
+  position: absolute;
+  left: 0;
+  top: calc((100svh - var(--piece-h)) / 2);
+  width: calc(var(--piece-w) * 3);
+  height: var(--piece-h);
+  margin-left: calc(-1 * var(--piece-w) - clamp(0px, var(--piece-w) * 0.7375 - 50vw, var(--piece-w) - 100vw));
+  transform-origin: 0 0;
+  transition: transform 1s cubic-bezier(0.65, 0, 0.25, 1);
+  user-select: none;
+}
+.piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--piece-w);
+  height: 100%;
+  isolation: isolate;
+  /* rien ne déborde de la pièce (halos, premier plan qui dépasse) */
+  overflow: clip;
+}
+.appartement[data-pret] {
+  margin-left: 0;
+}
+.piece.salon {
+  left: var(--piece-w);
+}
+.piece.studio {
+  left: calc(var(--piece-w) * 2);
+}
+/* Une pièce hors de l'écran ne s'anime pas, un panneau fermé non plus.
+   (L'appartement, lui, dit « data-cadre » quand la caméra cadre un objet :
+   s'il partageait le nom « data-ouvert » des panneaux, chaque ouverture
+   ferait recalculer le style de toute la scène à cause de la règle « * ».)
+   Ce qui ne se voit pas a son animation retirée, pas mise en pause : tant
+   qu'une animation en pause existe, Chrome la remet en attente à chaque
+   image pendant un mouvement de caméra, et le thread principal recalcule
+   alors toute la scène 120 fois par seconde. Idem plus bas (nuit, météo,
+   lampes éteintes, lueurs). */
+.piece[data-visible="false"] *,
+.panneau:not([data-ouvert="true"]) * {
+  animation-name: none !important;
+}
+/* Quand une pièce tient pile dans l'écran, le défilement s'arrête sur elle */
+@media (min-aspect-ratio: 8/5) {
+  .plateau {
+    scroll-snap-type: x mandatory;
+  }
+  .piece {
+    scroll-snap-align: start;
+  }
+}
+
+/* ─── Calques ──────────────────────────────────────────────────────── */
+.calque,
+.morceau {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+.remplir {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.vue {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.definitions {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Ce qu'on voit par la fenêtre, découpé à la taille de la vitre */
+.fenetre-vue {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: inset(10% 48% 39.6% 25.5%);
+}
+
+/* Parallaxe : ces calques sont déplacés par JavaScript (transform seul).
+   Pendant la visite d'un objet, on les laisse se redessiner nets au zoom. */
+.prl-ciel,
+.prl-avant {
+  will-change: transform;
+}
+.appartement[data-cadre="true"] .prl-ciel,
+.appartement[data-cadre="true"] .prl-avant {
+  will-change: auto;
+}
+
+/* ─── Le soir, la nuit ─────────────────────────────────────────────── */
+.jour-seul {
+  transition: opacity 1.4s ease, visibility 0s linear 0s;
+}
+.nuit-seule,
+.appartement[data-nuit="true"] .jour-seul {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.4s ease, visibility 0s linear 1.4s;
+}
+.appartement[data-nuit="true"] .nuit-seule {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1.4s ease, visibility 0s linear 0s;
+}
+/* Ce qu'on ne voit pas ne bouge pas */
+.appartement[data-nuit="true"] .jour-seul,
+.appartement[data-nuit="true"] .jour-seul *,
+.appartement:not([data-nuit="true"]) .nuit-seule,
+.appartement:not([data-nuit="true"]) .nuit-seule * {
+  animation-name: none;
+}
+
+.voile {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #1b2150;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.4s ease, visibility 0s linear 1.4s;
+}
+.appartement[data-nuit="true"] .voile {
+  opacity: 0.7;
+  visibility: visible;
+  transition: opacity 1.4s ease, visibility 0s linear 0s;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(61% 98% at 50% 52%, rgb(28 20 15 / 0) 55%, rgb(28 20 15 / 0.5) 100%);
+}
+
+.rayon {
+  opacity: 0.9;
+}
+
+/* ─── Lumières ─────────────────────────────────────────────────────── */
+.halo {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0.55;
+  transition: opacity 0.6s ease;
+}
+.appartement[data-nuit="true"] .halo {
+  opacity: 0.95;
+}
+.halo.ambre {
+  background: radial-gradient(closest-side, rgb(255 210 140 / 0.95), rgb(255 166 82 / 0.5) 30%, rgb(255 138 61 / 0));
+}
+.halo.tele {
+  background: radial-gradient(closest-side, rgb(228 236 255 / 0.5), rgb(185 200 255 / 0.16) 50%, rgb(185 200 255 / 0));
+}
+.halo.led {
+  background: radial-gradient(closest-side, rgb(160 110 255 / 0.5), rgb(140 90 240 / 0.16) 55%, rgb(140 90 240 / 0));
+}
+.halo.ecran {
+  background: radial-gradient(closest-side, rgb(205 195 255 / 0.4), rgb(205 195 255 / 0));
+}
+.halo.neon {
+  background: radial-gradient(closest-side, rgb(255 110 180 / 0.55), rgb(255 110 180 / 0.14) 50%, rgb(255 110 180 / 0));
+}
+.halo.froid {
+  background: radial-gradient(closest-side, rgb(255 246 230 / 0.55), rgb(255 240 220 / 0.14) 50%, rgb(255 240 220 / 0));
+}
+.halo.rouge {
+  background: radial-gradient(closest-side, rgb(255 70 60 / 0.7), rgb(255 70 60 / 0));
+}
+.halo.bougie {
+  background: radial-gradient(closest-side, rgb(255 217 143 / 0.95), rgb(255 176 84 / 0.35) 40%, rgb(255 154 61 / 0));
+}
+
+/* Lampes et bougies éteintes */
+.allume {
+  transition: opacity 0.35s ease;
+}
+.appartement[data-lanterne="false"] .si-lanterne,
+.appartement[data-champignon="false"] .si-champignon,
+.appartement[data-chevet="false"] .si-chevet,
+.appartement[data-bougies="false"] .si-bougies,
+.appartement[data-neon="false"] .si-neon,
+.appartement[data-studio="false"] .si-studio,
+.appartement[data-live="false"] .si-live {
+  opacity: 0;
+  animation-name: none;
+}
+
+/* ─── La météo de Villejuif, derrière les fenêtres ─────────────────── */
+.meteo {
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.6s ease, visibility 0s linear 1.6s;
+}
+.appartement:is([data-meteo="nuageux"], [data-meteo="pluie"], [data-meteo="neige"], [data-meteo="orage"]) .meteo-gris,
+.appartement:is([data-meteo="pluie"], [data-meteo="orage"]) .meteo-pluie,
+.appartement[data-meteo="neige"] .meteo-neige,
+.appartement[data-meteo="orage"] .meteo-eclair {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1.6s ease, visibility 0s linear 0s;
+}
+.appartement:not([data-meteo="pluie"]):not([data-meteo="orage"]) .meteo-pluie *,
+.appartement:not([data-meteo="neige"]) .meteo-neige *,
+.appartement:not([data-meteo="orage"]) .meteo-eclair {
+  animation-name: none;
+}
+.meteo-gris {
+  background: linear-gradient(to bottom, rgb(88 96 118 / 0.62), rgb(120 120 132 / 0.45));
+}
+.appartement[data-meteo="nuageux"] .meteo-gris {
+  opacity: 0.6;
+}
+/* sous un ciel couvert, plus d'étoiles ni de lune */
+.ciel-etoiles {
+  transition: opacity 1.6s ease;
+}
+.appartement:is([data-meteo="nuageux"], [data-meteo="pluie"], [data-meteo="neige"], [data-meteo="orage"]) .ciel-etoiles {
+  opacity: 0.12;
+}
+/* les rideaux de pluie et de neige glissent d'une tuile, en boucle */
+.rideau {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.rideau-pluie {
+  top: -1080px;
+  height: calc(100% + 1080px);
+  background-size: 60px 90px;
+  animation: tombe-90 5.04s linear infinite;
+}
+.rideau-pluie-loin {
+  top: -540px;
+  height: calc(100% + 540px);
+  background-size: 40px 60px;
+  animation: tombe-60 5.4s linear infinite;
+}
+.rideau-neige {
+  top: -120px;
+  height: calc(100% + 120px);
+  background-size: 120px 120px;
+  animation: tombe-120 6s linear infinite;
+}
+.rideau-neige-loin {
+  top: -80px;
+  height: calc(100% + 80px);
+  background-size: 80px 80px;
+  animation: tombe-80 9s linear infinite;
+}
+.gouttes {
+  background-size: 120px 120px;
+  opacity: 0.9;
+}
+.meteo-eclair {
+  background: #f2f4ff;
+}
+.appartement[data-meteo="orage"] .meteo-eclair {
+  animation: eclair 9s steps(1, end) infinite;
+}
+@keyframes tombe-90 {
+  to { transform: translateY(1080px); }
+}
+@keyframes tombe-60 {
+  to { transform: translateY(540px); }
+}
+@keyframes tombe-120 {
+  to { transform: translate(6px, 120px); }
+}
+@keyframes tombe-80 {
+  to { transform: translate(-4px, 80px); }
+}
+@keyframes eclair {
+  0%, 100% { opacity: 0; }
+  41% { opacity: 0.85; }
+  42% { opacity: 0; }
+  44% { opacity: 0.6; }
+  45% { opacity: 0; }
+}
+
+/* Le studio : ruban LED, chat qui défile, masque de la vitre du salon */
+.led-ruban {
+  position: absolute;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgb(178 128 255 / 0.5), rgb(178 128 255 / 0));
+  opacity: 0.75;
+  transition: opacity 0.6s ease;
+}
+.appartement[data-nuit="true"] .led-ruban {
+  opacity: 1;
+}
+.ecran-chat {
+  overflow: hidden;
+  border-radius: 2px;
+}
+.chat-defile {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 200%;
+  animation: chat 28s linear infinite;
+}
+.masque-vitre {
+  -webkit-mask: var(--masque) 0 0 / 100% 100% no-repeat;
+  mask: var(--masque) 0 0 / 100% 100% no-repeat;
+}
+
+.poussiere {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff4da;
+  pointer-events: none;
+  animation: poussiere 28s ease-in-out infinite;
+}
+
+/* ─── Objets qu'on peut toucher ────────────────────────────────────── */
+/* Seules les formes dessinées captent la souris, pas la boîte entière */
+.objet {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  cursor: pointer;
+  /* la lueur (filter) apparaît d'un coup : animée, Chrome devrait la
+     redessiner à chaque image ; seul le léger soulèvement est animé */
+  transition: transform 0.35s ease;
+}
+.objet .vue * {
+  pointer-events: visiblePainted;
+}
+.objet:hover,
+.objet:focus-visible,
+.objet[data-actif] {
+  filter: drop-shadow(0 0 7px rgb(255 214 150 / 0.95)) drop-shadow(0 0 2px rgb(255 240 210 / 0.9));
+}
+.objet.sans-lueur:hover {
+  filter: none;
+}
+.objet:focus-visible {
+  outline: 3px solid var(--color-brique);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+.soulever:hover,
+.soulever:focus-visible,
+.soulever[data-actif] {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+/* ─── Mode léger (components/appart/qualite.ts) : l'appareil peine ─── */
+/* pas de lueur floue au survol (à chaque apparition, la carte graphique
+   redessine l'objet et son halo) : un léger soulèvement à la place */
+[data-leger="true"] .objet:hover,
+[data-leger="true"] .objet:focus-visible,
+[data-leger="true"] .objet[data-actif] {
+  filter: none;
+}
+[data-leger="true"] .objet:not(.soulever):is(:hover, :focus-visible, [data-actif]) {
+  transform: translateY(-3px);
+}
+/* moins de petites animations d'ambiance : chacune coûte un peu à chaque
+   image que le navigateur refait (et il en refait une à chaque mouvement
+   de souris) */
+[data-leger="true"] :is(.poussiere, .anim-oiseaux, .rideau-saison-loin, .rideau-lucioles, .rideau-pluie-loin, .rideau-neige-loin, .anim-filante) {
+  display: none;
+}
+[data-leger="true"] :is(.anim-nuages, .indice, .anim-zzz) {
+  animation-name: none;
+}
+
+/* ─── Animations d'ambiance (coupées par prefers-reduced-motion) ────── */
+.anim-nuages {
+  animation: nuages 90s linear infinite alternate;
+}
+.anim-oiseaux {
+  animation: oiseaux 26s linear infinite;
+}
+.anim-aile {
+  transform-origin: 50% 70%;
+  animation: aile 6.08s ease-in-out infinite;
+}
+.anim-scintille {
+  animation: scintille 19.2s ease-in-out infinite;
+}
+.anim-eiffel {
+  animation: eiffel-long 18s steps(1, end) infinite;
+}
+.anim-flamme {
+  transform-origin: 50% 90%;
+  animation: flamme 10.8s ease-in-out infinite;
+}
+.anim-vapeur {
+  animation: vapeur 16.8s ease-out infinite;
+}
+.anim-respire {
+  animation: respire 18.4s ease-in-out infinite;
+}
+.anim-queue {
+  animation: queue 21s ease-in-out infinite;
+}
+.anim-zzz {
+  animation: zzz 18.4s ease-out infinite;
+}
+.anim-fumee {
+  animation: fumee 2.4s ease-out forwards;
+}
+.anim-coeur {
+  transform-origin: center;
+  animation: coeur 1.6s ease-out both;
+}
+.anim-zap {
+  animation: zap 0.45s steps(5) forwards;
+}
+.anim-ecran {
+  transform-origin: center;
+  animation: ecran 0.5s ease-out;
+}
+/* le ballon : en suspension, puis le smash (en % de sa propre taille) */
+.anim-flotte {
+  animation: flotte 16.8s ease-in-out infinite;
+}
+.anim-smash {
+  /* le ballon part quand la main du joueur le frappe (à 0,48 s) */
+  animation: smash 1.3s cubic-bezier(0.35, 0.1, 0.6, 1) 0.48s both;
+}
+/* le petit joueur : en attente, le saut, le bras qui frappe, son ombre */
+.anim-pret {
+  animation: pret 16s ease-in-out infinite;
+}
+.anim-saut {
+  animation: saut 1.1s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+.anim-frappe {
+  animation: frappe 1.1s ease-in-out both;
+}
+.anim-ombre-saut {
+  transform-origin: center;
+  animation: ombre-saut 1.1s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+/* la platine du salon : le disque tourne dans son plan, puis la perspective l'écrase */
+.disque-perspective {
+  transform: scaleY(0.27);
+  transform-origin: 50% 50%;
+}
+.anim-tourne {
+  animation: tourne 18s linear infinite;
+}
+.bras-platine {
+  transform-origin: 83.3% 54.8%;
+  transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* le bras pivote vers la gauche, au-dessus du disque */
+.bras-platine[data-joue="true"] {
+  transform: rotate(36deg);
+}
+.anim-note-boucle {
+  animation: note 3.3s ease-out infinite;
+}
+
+/* jouer dans la scène : les cordes de la guitare, les touches du clavier */
+.zone-jeu {
+  position: absolute;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: none;
+  border-radius: 10px;
+}
+.zone-jeu:focus-visible {
+  outline: 3px solid var(--color-brique);
+  outline-offset: 3px;
+}
+.touche-appuyee {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgb(201 168 255 / 0.55);
+  border-radius: 2px;
+  pointer-events: none;
+  animation: touche 0.5s ease-out both;
+}
+@keyframes touche {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* le coin musique : les cordes vibrent, les notes s'envolent */
+.anim-vibre {
+  transform-origin: 50% 50%;
+  animation: vibre 0.07s linear 22 alternate;
+}
+.anim-note {
+  animation: note 1.6s ease-out both;
+}
+.anim-balayage {
+  animation: balayage 8s ease-in-out infinite;
+}
+.anim-ventilo {
+  animation: ventilo 12s linear infinite;
+}
+.anim-neon {
+  animation: neon 7s steps(1, end) infinite;
+}
+.anim-direct {
+  animation: eiffel-long 20s steps(1, end) infinite;
+}
+.fondu-vite {
+  transition: opacity 0.35s ease;
+}
+
+/* Les déplacements sont en % de la taille du calque : ils suivent le zoom */
+@keyframes nuages {
+  from { transform: translateX(-10%); }
+  to { transform: translateX(13%); }
+}
+@keyframes oiseaux {
+  0% { transform: translate(-250%, 83%); }
+  60%, 100% { transform: translate(1083%, -111%); }
+}
+@keyframes aile {
+  0% { transform: scaleY(1); }
+  6.25% { transform: scaleY(-0.6); }
+  12.5% { transform: scaleY(1); }
+  18.75% { transform: scaleY(-0.6); }
+  25% { transform: scaleY(1); }
+  31.25% { transform: scaleY(-0.6); }
+  37.5% { transform: scaleY(1); }
+  43.75% { transform: scaleY(-0.6); }
+  50% { transform: scaleY(1); }
+  56.25% { transform: scaleY(-0.6); }
+  62.5% { transform: scaleY(1); }
+  68.75% { transform: scaleY(-0.6); }
+  75% { transform: scaleY(1); }
+  81.25% { transform: scaleY(-0.6); }
+  87.5% { transform: scaleY(1); }
+  93.75% { transform: scaleY(-0.6); }
+  100% { transform: scaleY(1); }
+}
+@keyframes scintille {
+  0% { opacity: 0.25; }
+  8.333% { opacity: 1; }
+  16.667% { opacity: 0.25; }
+  25% { opacity: 1; }
+  33.333% { opacity: 0.25; }
+  41.667% { opacity: 1; }
+  50% { opacity: 0.25; }
+  58.333% { opacity: 1; }
+  66.667% { opacity: 0.25; }
+  75% { opacity: 1; }
+  83.333% { opacity: 0.25; }
+  91.667% { opacity: 1; }
+  100% { opacity: 0.25; }
+}
+@keyframes eiffel-long {
+  0% { opacity: 1; }
+  2.5% { opacity: 0.2; }
+  5% { opacity: 1; }
+  7.5% { opacity: 0.2; }
+  10% { opacity: 1; }
+  12.5% { opacity: 0.2; }
+  15% { opacity: 1; }
+  17.5% { opacity: 0.2; }
+  20% { opacity: 1; }
+  22.5% { opacity: 0.2; }
+  25% { opacity: 1; }
+  27.5% { opacity: 0.2; }
+  30% { opacity: 1; }
+  32.5% { opacity: 0.2; }
+  35% { opacity: 1; }
+  37.5% { opacity: 0.2; }
+  40% { opacity: 1; }
+  42.5% { opacity: 0.2; }
+  45% { opacity: 1; }
+  47.5% { opacity: 0.2; }
+  50% { opacity: 1; }
+  52.5% { opacity: 0.2; }
+  55% { opacity: 1; }
+  57.5% { opacity: 0.2; }
+  60% { opacity: 1; }
+  62.5% { opacity: 0.2; }
+  65% { opacity: 1; }
+  67.5% { opacity: 0.2; }
+  70% { opacity: 1; }
+  72.5% { opacity: 0.2; }
+  75% { opacity: 1; }
+  77.5% { opacity: 0.2; }
+  80% { opacity: 1; }
+  82.5% { opacity: 0.2; }
+  85% { opacity: 1; }
+  87.5% { opacity: 0.2; }
+  90% { opacity: 1; }
+  92.5% { opacity: 0.2; }
+  95% { opacity: 1; }
+  97.5% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+@keyframes eiffel {
+  0% { opacity: 1; }
+  100% { opacity: 0.2; }
+}
+@keyframes flamme {
+  0% { transform: scale(1, 1) skewX(0deg); }
+  4.167% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  8.333% { transform: scale(1.04, 0.95) skewX(2deg); }
+  12.5% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  16.667% { transform: scale(1, 1) skewX(0deg); }
+  20.833% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  25% { transform: scale(1.04, 0.95) skewX(2deg); }
+  29.167% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  33.333% { transform: scale(1, 1) skewX(0deg); }
+  37.5% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  41.667% { transform: scale(1.04, 0.95) skewX(2deg); }
+  45.833% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  50% { transform: scale(1, 1) skewX(0deg); }
+  54.167% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  58.333% { transform: scale(1.04, 0.95) skewX(2deg); }
+  62.5% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  66.667% { transform: scale(1, 1) skewX(0deg); }
+  70.833% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  75% { transform: scale(1.04, 0.95) skewX(2deg); }
+  79.167% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  83.333% { transform: scale(1, 1) skewX(0deg); }
+  87.5% { transform: scale(0.94, 1.08) skewX(-3deg); }
+  91.667% { transform: scale(1.04, 0.95) skewX(2deg); }
+  95.833% { transform: scale(0.97, 1.04) skewX(-1deg); }
+  100% { transform: scale(1, 1) skewX(0deg); }
+}
+@keyframes vapeur {
+  0% { opacity: 0; transform: translateY(17%); }
+  6.25% { opacity: 0.7; }
+  24.99% { opacity: 0; transform: translateY(-74%); }
+  25% { opacity: 0; transform: translateY(17%); }
+  31.25% { opacity: 0.7; }
+  49.99% { opacity: 0; transform: translateY(-74%); }
+  50% { opacity: 0; transform: translateY(17%); }
+  56.25% { opacity: 0.7; }
+  74.99% { opacity: 0; transform: translateY(-74%); }
+  75% { opacity: 0; transform: translateY(17%); }
+  81.25% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-74%); }
+}
+@keyframes respire {
+  0% { transform: scale(1, 1); }
+  12.5% { transform: scale(1.012, 1.045); }
+  25% { transform: scale(1, 1); }
+  37.5% { transform: scale(1.012, 1.045); }
+  50% { transform: scale(1, 1); }
+  62.5% { transform: scale(1.012, 1.045); }
+  75% { transform: scale(1, 1); }
+  87.5% { transform: scale(1.012, 1.045); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes queue {
+  0% { transform: rotate(0deg); }
+  26.667% { transform: rotate(0deg); }
+  28.333% { transform: rotate(-9deg); }
+  30% { transform: rotate(4deg); }
+  33.333% { transform: rotate(0deg); }
+  60% { transform: rotate(0deg); }
+  61.667% { transform: rotate(-9deg); }
+  63.333% { transform: rotate(4deg); }
+  66.667% { transform: rotate(0deg); }
+  93.333% { transform: rotate(0deg); }
+  95% { transform: rotate(-9deg); }
+  96.667% { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes zzz {
+  0% { opacity: 0; transform: translate(0, 0); }
+  5% { opacity: 1; }
+  24.99% { opacity: 0; transform: translate(100%, -170%); }
+  25% { opacity: 0; transform: translate(0, 0); }
+  30% { opacity: 1; }
+  49.99% { opacity: 0; transform: translate(100%, -170%); }
+  50% { opacity: 0; transform: translate(0, 0); }
+  55% { opacity: 1; }
+  74.99% { opacity: 0; transform: translate(100%, -170%); }
+  75% { opacity: 0; transform: translate(0, 0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(100%, -170%); }
+}
+@keyframes poussiere {
+  0% { transform: translate(0, 0); opacity: 0.2; }
+  25% { transform: translate(14px, -26px); opacity: 0.9; }
+  50% { transform: translate(0, 0); opacity: 0.2; }
+  75% { transform: translate(14px, -26px); opacity: 0.9; }
+  100% { transform: translate(0, 0); opacity: 0.2; }
+}
+@keyframes fumee {
+  0% { opacity: 0.8; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(3%, -44%); }
+}
+@keyframes coeur {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  25% { opacity: 1; transform: translateY(-30%) scale(1); }
+  100% { opacity: 0; transform: translateY(-140%) scale(1.1); }
+}
+@keyframes flotte {
+  0% { transform: translateY(0) rotate(-6deg); }
+  8.333% { transform: translateY(-14%) rotate(6deg); }
+  16.667% { transform: translateY(0) rotate(-6deg); }
+  25% { transform: translateY(-14%) rotate(6deg); }
+  33.333% { transform: translateY(0) rotate(-6deg); }
+  41.667% { transform: translateY(-14%) rotate(6deg); }
+  50% { transform: translateY(0) rotate(-6deg); }
+  58.333% { transform: translateY(-14%) rotate(6deg); }
+  66.667% { transform: translateY(0) rotate(-6deg); }
+  75% { transform: translateY(-14%) rotate(6deg); }
+  83.333% { transform: translateY(0) rotate(-6deg); }
+  91.667% { transform: translateY(-14%) rotate(6deg); }
+  100% { transform: translateY(0) rotate(-6deg); }
+}
+@keyframes smash {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  40% { transform: translate(571%, 504%) rotate(420deg) scale(0.62); animation-timing-function: ease-out; }
+  55% { transform: translate(661%, 429%) rotate(500deg) scale(0.6); animation-timing-function: ease-in; }
+  75% { transform: translate(723%, 507%) rotate(580deg) scale(0.58); opacity: 1; }
+  100% { transform: translate(759%, 511%) rotate(620deg) scale(0.58); opacity: 0; }
+}
+@keyframes pret {
+  0% { transform: translateY(0) scaleY(1); }
+  5% { transform: translateY(0.6%) scaleY(0.985); }
+  10% { transform: translateY(0) scaleY(1); }
+  15% { transform: translateY(0.6%) scaleY(0.985); }
+  20% { transform: translateY(0) scaleY(1); }
+  25% { transform: translateY(0.6%) scaleY(0.985); }
+  30% { transform: translateY(0) scaleY(1); }
+  35% { transform: translateY(0.6%) scaleY(0.985); }
+  40% { transform: translateY(0) scaleY(1); }
+  45% { transform: translateY(0.6%) scaleY(0.985); }
+  50% { transform: translateY(0) scaleY(1); }
+  55% { transform: translateY(0.6%) scaleY(0.985); }
+  60% { transform: translateY(0) scaleY(1); }
+  65% { transform: translateY(0.6%) scaleY(0.985); }
+  70% { transform: translateY(0) scaleY(1); }
+  75% { transform: translateY(0.6%) scaleY(0.985); }
+  80% { transform: translateY(0) scaleY(1); }
+  85% { transform: translateY(0.6%) scaleY(0.985); }
+  90% { transform: translateY(0) scaleY(1); }
+  95% { transform: translateY(0.6%) scaleY(0.985); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+@keyframes saut {
+  0% { transform: translateY(0) scaleY(1); }
+  18% { transform: translateY(2%) scaleY(0.95); }
+  44% { transform: translateY(-33%) scaleY(1.02); }
+  54% { transform: translateY(-31%) scaleY(1); }
+  82% { transform: translateY(0) scaleY(1); }
+  90% { transform: translateY(1.2%) scaleY(0.97); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+@keyframes frappe {
+  0% { transform: rotate(0deg); }
+  22% { transform: rotate(-150deg); }
+  38% { transform: rotate(-196deg); }
+  47% { transform: rotate(-95deg); }
+  66% { transform: rotate(-25deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes ombre-saut {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  44%, 54% { transform: scale(0.6); opacity: 0.5; }
+}
+@keyframes tourne {
+  to { transform: rotate(3600deg); }
+}
+@keyframes vibre {
+  from { transform: scaleX(1.6); }
+  to { transform: scaleX(0.5); }
+}
+@keyframes note {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  20% { opacity: 1; transform: translate(10%, -40%) scale(1); }
+  100% { opacity: 0; transform: translate(60%, -260%) scale(1.1) rotate(12deg); }
+}
+@keyframes balayage {
+  0%, 100% { transform: rotate(calc(var(--angle) - 6deg)); }
+  50% { transform: rotate(calc(var(--angle) + 6deg)); }
+}
+@keyframes ventilo {
+  to { transform: rotate(3600deg); }
+}
+@keyframes chat {
+  to { transform: translateY(-50%); }
+}
+/* le néon grésille de temps en temps */
+@keyframes neon {
+  0%, 61%, 63%, 65%, 100% { opacity: 1; }
+  62%, 64% { opacity: 0.35; }
+}
+@keyframes zap {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes ecran {
+  0% { transform: scaleY(0.02); opacity: 0.4; }
+  60% { transform: scaleY(1.02); opacity: 1; }
+  100% { transform: scaleY(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Interface posée sur la scène
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Étiquettes manuscrites au survol des objets */
+.etiquette {
+  position: absolute;
+  z-index: 5;
+  translate: -50% -100%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px) rotate(-2deg);
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.etiquette[data-actif] {
+  opacity: 1;
+  transform: translateY(-10px) rotate(-2deg);
+}
+
+/* Petites lueurs qui indiquent les objets à visiter */
+.indice {
+  position: absolute;
+  z-index: 4;
+  width: 14px;
+  height: 14px;
+  translate: -50% -50%;
+  pointer-events: none;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fff6df 0 28%, rgb(247 201 135 / 0.9) 30%, rgb(247 201 135 / 0) 70%);
+  animation: indice 19.2s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+}
+.appartement[data-visite="true"] .indice,
+.appartement[data-cadre="true"] .indice {
+  opacity: 0;
+  animation-name: none;
+}
+@keyframes indice {
+  0% { transform: scale(0.8); opacity: 0.65; }
+  6.25% { transform: scale(1.35); opacity: 1; }
+  12.5% { transform: scale(0.8); opacity: 0.65; }
+  18.75% { transform: scale(1.35); opacity: 1; }
+  25% { transform: scale(0.8); opacity: 0.65; }
+  31.25% { transform: scale(1.35); opacity: 1; }
+  37.5% { transform: scale(0.8); opacity: 0.65; }
+  43.75% { transform: scale(1.35); opacity: 1; }
+  50% { transform: scale(0.8); opacity: 0.65; }
+  56.25% { transform: scale(1.35); opacity: 1; }
+  62.5% { transform: scale(0.8); opacity: 0.65; }
+  68.75% { transform: scale(1.35); opacity: 1; }
+  75% { transform: scale(0.8); opacity: 0.65; }
+  81.25% { transform: scale(1.35); opacity: 1; }
+  87.5% { transform: scale(0.8); opacity: 0.65; }
+  93.75% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.65; }
+}
+
+/* Panneaux : à gauche sur ordinateur (les objets à visiter sont tous du
+   côté droit de la pièce), en tiroir sur mobile */
+.panneau {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    transform 0.7s cubic-bezier(0.65, 0, 0.25, 1),
+    opacity 0.45s ease,
+    visibility 0s linear 0.7s;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: min(72svh, 720px);
+  border-radius: 26px 26px 0 0;
+  transform: translateY(105%);
+}
+.panneau[data-ouvert="true"] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s,
+    opacity 0.45s ease 0.2s,
+    visibility 0s linear 0s;
+}
+@media (min-width: 900px) {
+  .panneau {
+    left: 16px;
+    top: 16px;
+    right: auto;
+    bottom: 16px;
+    width: min(500px, 42vw);
+    height: auto;
+    border-radius: 28px;
+    transform: translateX(calc(-100% - 40px)) rotate(-2deg);
+  }
+}
+
+/* Sans JavaScript : les liens #ancre ouvrent quand même les panneaux */
+html:not(.js) .panneau:target {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+.hud {
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.hud[data-cache="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Interrupteur rétro */
+.interrupteur-levier {
+  transition: transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* ─── Mouvement réduit : tout se pose, rien ne bouge ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+  }
+  .anim-vapeur,
+  .anim-zzz,
+  .anim-oiseaux,
+  .indice {
+    animation: none !important;
+  }
+  .anim-oiseaux {
+    display: none;
+  }
+}
+
+/* ─── La visite express (/en-bref) : une fiche, qui s'imprime en CV ──── */
+.fiche-point {
+  position: relative;
+  padding-left: 1.4rem;
+}
+.fiche-point::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.62em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-terracotta);
+}
+.fiche-imprime {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  html,
+  body {
+    height: auto;
+    overflow: visible;
+    background: #fff;
+  }
+  .fiche-defile {
+    position: static;
+    overflow: visible;
+    background: #fff;
+  }
+  .fiche-barre {
+    display: none;
+  }
+  .fiche {
+    margin: 0;
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: #fff;
+  }
+  .fiche-bloc,
+  .fiche-carte {
+    break-inside: avoid;
+  }
+  .fiche-bloc {
+    margin-top: 1.4rem;
+  }
+  .fiche-imprime {
+    display: block;
+  }
+  /* le cadre sombre du bas : les navigateurs n'impriment pas les fonds */
+  .fiche-appel {
+    background: #fff;
+    color: var(--color-espresso);
+    border: 1px solid var(--color-sable);
+  }
+  .fiche .bouton,
+  .fiche .bouton-second {
+    box-shadow: none;
+  }
+  /* sans fond à l'impression, le bouton plein deviendrait illisible */
+  .fiche .bouton {
+    background: none;
+    color: var(--color-espresso);
+    border: 1.5px solid var(--color-sable);
+  }
+  .fiche-point::before {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ─── Les saisons (components/appart/saisons.ts) ─────────────────────── */
+.anim-guirlande {
+  animation: guirlande 12.8s ease-in-out infinite;
+}
+.anim-citrouille {
+  animation: citrouille 14.4s ease-in-out infinite;
+}
+.anim-araignee {
+  animation: araignee 20.4s ease-in-out infinite;
+}
+.anim-chauves-souris {
+  animation: oiseaux 17s linear infinite;
+}
+.anim-feu {
+  transform-origin: 50% 50%;
+  animation: feu 3s ease-out infinite;
+}
+/* feuilles mortes, pétales, lucioles : des tuiles qui glissent en boucle */
+.saison-dehors {
+  overflow: hidden;
+}
+.rideau-saison,
+.rideau-saison-loin,
+.rideau-lucioles {
+  position: absolute;
+  left: 0;
+}
+.rideau-saison {
+  top: -320px;
+  width: calc(100% + 160px);
+  height: calc(100% + 320px);
+  background-size: 160px 160px;
+  animation: derive-160 18s linear infinite;
+}
+.rideau-saison-loin {
+  top: -200px;
+  width: calc(100% + 100px);
+  height: calc(100% + 200px);
+  background-size: 100px 100px;
+  animation: derive-100 26s linear infinite;
+}
+.rideau-lucioles {
+  left: -180px;
+  top: 0;
+  width: calc(100% + 180px);
+  height: calc(100% + 180px);
+  background-size: 180px 180px;
+  animation: lucioles 50s linear infinite;
+}
+.rideau-lucioles.lent {
+  background-position: 90px 60px;
+  animation-duration: 70s;
+}
+@keyframes guirlande {
+  0% { opacity: 1; }
+  12.5% { opacity: 0.3; }
+  25% { opacity: 1; }
+  37.5% { opacity: 0.3; }
+  50% { opacity: 1; }
+  62.5% { opacity: 0.3; }
+  75% { opacity: 1; }
+  87.5% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+@keyframes citrouille {
+  0% { opacity: 1; }
+  16.667% { opacity: 0.7; }
+  33.333% { opacity: 1; }
+  50% { opacity: 0.7; }
+  66.667% { opacity: 1; }
+  83.333% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+@keyframes araignee {
+  0% { transform: translateY(0); }
+  16.667% { transform: translateY(15%); }
+  33.333% { transform: translateY(0); }
+  50% { transform: translateY(15%); }
+  66.667% { transform: translateY(0); }
+  83.333% { transform: translateY(15%); }
+  100% { transform: translateY(0); }
+}
+@keyframes feu {
+  0% { transform: scale(0.15); opacity: 0; }
+  10% { opacity: 1; }
+  65% { transform: scale(1); opacity: 0.85; }
+  100% { transform: scale(1.06); opacity: 0; }
+}
+@keyframes derive-160 {
+  to { transform: translate(-160px, 320px); }
+}
+@keyframes derive-100 {
+  to { transform: translate(-100px, 200px); }
+}
+@keyframes lucioles {
+  to { transform: translate(180px, -180px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-chauves-souris {
+    display: none;
+  }
+}
+
+/* les temps forts de l'année : ballons qui se balancent, drapeau au vent,
+   notes de musique qui montent de la rue */
+.anim-ballons {
+  animation: ballons 25.2s ease-in-out infinite;
+}
+.anim-drapeau {
+  transform-origin: 14% 90%;
+  animation: drapeau 20.8s ease-in-out infinite;
+}
+.rideau-saison.monte {
+  top: 0;
+  left: -160px;
+  animation-name: monte-160;
+}
+.rideau-saison-loin.monte {
+  top: 0;
+  left: -100px;
+  animation-name: monte-100;
+}
+@keyframes ballons {
+  0% { transform: rotate(-2.5deg); }
+  16.667% { transform: rotate(2.5deg); }
+  33.333% { transform: rotate(-2.5deg); }
+  50% { transform: rotate(2.5deg); }
+  66.667% { transform: rotate(-2.5deg); }
+  83.333% { transform: rotate(2.5deg); }
+  100% { transform: rotate(-2.5deg); }
+}
+@keyframes drapeau {
+  0% { transform: skewY(-3deg); }
+  12.5% { transform: skewY(2deg); }
+  25% { transform: skewY(-3deg); }
+  37.5% { transform: skewY(2deg); }
+  50% { transform: skewY(-3deg); }
+  62.5% { transform: skewY(2deg); }
+  75% { transform: skewY(-3deg); }
+  87.5% { transform: skewY(2deg); }
+  100% { transform: skewY(-3deg); }
+}
+@keyframes monte-160 {
+  to { transform: translate(160px, -320px); }
+}
+@keyframes monte-100 {
+  to { transform: translate(100px, -200px); }
+}
+
+/* ─── L'horloge du salon : les aiguilles gardent l'heure toutes seules ── */
+.aiguille {
+  transform-origin: 50% 50%;
+  animation: tour 60s linear infinite;
+}
+.aiguille-heures {
+  animation-duration: 43200s;
+}
+.aiguille-minutes {
+  animation-duration: 3600s;
+}
+/* une horloge ne s'arrête pas quand on change de pièce */
+.piece[data-visible] .aiguille {
+  animation-name: tour !important;
+}
+@keyframes tour {
+  to { transform: rotate(360deg); }
+}
+.bulle-horloge {
+  animation: bulle 3.8s ease both;
+}
+@keyframes bulle {
+  0% { opacity: 0; transform: translateY(6%); }
+  8%, 85% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+/* ─── Les secrets ──────────────────────────────────────────────────── */
+.anim-filante {
+  animation: filante 1.1s ease-out forwards;
+}
+@keyframes filante {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(300%, 380%); }
+}
+.anim-scintillement {
+  animation: eiffel 0.24s steps(2, jump-none) infinite;
+}
+/* le chat ouvre les yeux, et arrête de ronfler */
+.yeux-chat {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.appartement[data-chat="eveille"] .yeux-chat {
+  opacity: 1;
+}
+.appartement[data-chat="eveille"] .anim-zzz {
+  opacity: 0;
+}
+/* le néon détraqué */
+.appartement[data-glitch="true"] .si-neon {
+  animation: glitch 0.16s steps(2, jump-none) infinite !important;
+}
+@keyframes glitch {
+  0% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+/* les confettis du gymnase */
+.confetti {
+  position: absolute;
+  top: -4%;
+  width: 0.7%;
+  height: 2.2%;
+  border-radius: 1px;
+  animation: confetti 2.8s cubic-bezier(0.3, 0.6, 0.5, 1) both;
+}
+@keyframes confetti {
+  0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(2400%) rotate(540deg); }
+}
+/* l'annonce d'un secret trouvé */
+.annonce-secret {
+  animation: annonce 4.2s ease both;
+}
+@keyframes annonce {
+  0% { opacity: 0; transform: translateY(-10px); }
+  8%, 86% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+
+/* ─── Le mode disco ────────────────────────────────────────────────── */
+.disco {
+  animation: disco 12s ease both;
+}
+@keyframes disco {
+  0% { opacity: 0; }
+  4%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.disco-spot {
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  margin: -23vmax 0 0 -23vmax;
+  border-radius: 50%;
+  animation: spot 3s ease-in-out infinite alternate;
+}
+@keyframes spot {
+  0% { transform: translate(-18vmax, -6vmax) scale(0.9); }
+  50% { transform: translate(14vmax, 10vmax) scale(1.1); }
+  100% { transform: translate(-4vmax, 18vmax) scale(0.95); }
+}
+.disco-boule {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 90px;
+  height: 180px;
+  margin-left: -45px;
+  animation: boule 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes boule {
+  from { transform: translateY(-100%); }
+  to { transform: none; }
+}
+.disco-reflets {
+  animation: eiffel 0.5s steps(2, jump-none) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* les aiguilles gardent l'heure, lentement ; la trotteuse se cache */
+  .aiguille-heures {
+    animation-duration: 43200s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .aiguille-minutes {
+    animation-duration: 3600s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .aiguille-secondes,
+  .disco-spot {
+    display: none;
+  }
+  .disco {
+    animation: none !important;
+  }
+}
+
+/* ─── Le logo de Krylos, en quatre pétales (components/appart/LogoKrylos) ── */
+.logo-krylos .petale,
+.logo-krylos .souffle {
+  position: absolute;
+  inset: 0;
+}
+.logo-krylos img {
+  position: absolute;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+/* au repos : les pétales respirent, chacun dans sa direction
+   (animations toujours nommées en entier : le CSS compilé déforme les
+   raccourcis sans nom) */
+.logo-krylos .souffle-1 { animation: souffle-1 21.6s ease-in-out infinite; }
+.logo-krylos .souffle-2 { animation: souffle-2 21.6s ease-in-out -0.9s infinite; }
+.logo-krylos .souffle-3 { animation: souffle-3 21.6s ease-in-out -1.8s infinite; }
+.logo-krylos .souffle-4 { animation: souffle-4 21.6s ease-in-out -2.7s infinite; }
+@keyframes souffle-1 {
+  0% { transform: translate(0, 0); }
+  16.667% { transform: translate(-0.9%, -0.8%); }
+  33.333% { transform: translate(0, 0); }
+  50% { transform: translate(-0.9%, -0.8%); }
+  66.667% { transform: translate(0, 0); }
+  83.333% { transform: translate(-0.9%, -0.8%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes souffle-2 {
+  0% { transform: translate(0, 0); }
+  16.667% { transform: translate(0.8%, -0.9%); }
+  33.333% { transform: translate(0, 0); }
+  50% { transform: translate(0.8%, -0.9%); }
+  66.667% { transform: translate(0, 0); }
+  83.333% { transform: translate(0.8%, -0.9%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes souffle-3 {
+  0% { transform: translate(0, 0); }
+  16.667% { transform: translate(1.1%, 0.4%); }
+  33.333% { transform: translate(0, 0); }
+  50% { transform: translate(1.1%, 0.4%); }
+  66.667% { transform: translate(0, 0); }
+  83.333% { transform: translate(1.1%, 0.4%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes souffle-4 {
+  0% { transform: translate(0, 0); }
+  16.667% { transform: translate(-0.6%, 1.1%); }
+  33.333% { transform: translate(0, 0); }
+  50% { transform: translate(-0.6%, 1.1%); }
+  66.667% { transform: translate(0, 0); }
+  83.333% { transform: translate(-0.6%, 1.1%); }
+  100% { transform: translate(0, 0); }
+}
+/* au survol : ils s'écartent en tournant, le K se dessine entre eux */
+.logo-krylos .petale {
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:is(.objet:hover, .objet:focus-visible, .objet[data-actif], .logo-lumineux[data-actif], .logo-panneau:hover) .petale-1 {
+  transform: translate(-6%, -5.5%) rotate(-7deg);
+}
+:is(.objet:hover, .objet:focus-visible, .objet[data-actif], .logo-lumineux[data-actif], .logo-panneau:hover) .petale-2 {
+  transform: translate(5.4%, -6%) rotate(-7deg);
+}
+:is(.objet:hover, .objet:focus-visible, .objet[data-actif], .logo-lumineux[data-actif], .logo-panneau:hover) .petale-3 {
+  transform: translate(7.6%, 2.6%) rotate(-7deg);
+}
+:is(.objet:hover, .objet:focus-visible, .objet[data-actif], .logo-lumineux[data-actif], .logo-panneau:hover) .petale-4 {
+  transform: translate(-4%, 7%) rotate(-7deg);
+}
+/* la copie lumineuse de la nuit suit l'affiche quand elle se soulève */
+.logo-lumineux {
+  transition: transform 0.35s ease;
+}
+.logo-lumineux[data-actif] {
+  transform: translateY(-4px) rotate(-1deg);
+}
+.halo-krylos {
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side at 32% 30%, rgb(255 90 170 / 0.32), transparent),
+    radial-gradient(closest-side at 70% 28%, rgb(255 170 60 / 0.3), transparent),
+    radial-gradient(closest-side at 74% 66%, rgb(60 170 255 / 0.3), transparent),
+    radial-gradient(closest-side at 34% 72%, rgb(130 80 255 / 0.32), transparent);
+}
+/* dans le panneau : les pétales arrivent de quatre côtés et s'assemblent */
+.panneau[data-ouvert="true"] .logo-panneau .petale-1 { animation: arrive-1 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s backwards; }
+.panneau[data-ouvert="true"] .logo-panneau .petale-2 { animation: arrive-2 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s backwards; }
+.panneau[data-ouvert="true"] .logo-panneau .petale-3 { animation: arrive-3 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.55s backwards; }
+.panneau[data-ouvert="true"] .logo-panneau .petale-4 { animation: arrive-4 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.65s backwards; }
+@keyframes arrive-1 { from { opacity: 0; transform: translate(-70%, -60%) rotate(-60deg) scale(0.6); } }
+@keyframes arrive-2 { from { opacity: 0; transform: translate(70%, -70%) rotate(60deg) scale(0.6); } }
+@keyframes arrive-3 { from { opacity: 0; transform: translate(80%, 30%) rotate(-50deg) scale(0.6); } }
+@keyframes arrive-4 { from { opacity: 0; transform: translate(-40%, 80%) rotate(50deg) scale(0.6); } }
+
+/* ─── L'arrivée : la porte du palier (components/appart/Entree.tsx) ───── */
+.entree-appart {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  cursor: pointer;
+}
+html:not(.js) .entree-appart,
+.sans-entree .entree-appart {
+  display: none;
+}
+.entree-scene {
+  position: absolute;
+  left: calc(50% - max(100vw, 160svh) / 2);
+  top: calc(50% - max(100svh, 62.5vw) / 2);
+  width: max(100vw, 160svh);
+  height: max(100svh, 62.5vw);
+  /* on entre par la porte : le zoom vise son centre ; la résolution reste
+     celle de départ (pas de redessin au début du mouvement) */
+  transform-origin: 50% 50.5%;
+  will-change: transform;
+  /* à peine translucide (invisible à l'œil) : le navigateur prépare déjà le
+     salon caché dessous, au lieu de tout dessiner quand le palier s'efface */
+  opacity: 0.995;
+  /* au début, on voit la porte du bout du couloir */
+  scale: 0.74;
+}
+/* l'approche (data-marche, posé par Entree.tsx) : on remonte le couloir
+   (scale) à petits pas (translate, rotate) */
+.entree-appart[data-marche] .entree-scene {
+  animation:
+    approche 1.7s cubic-bezier(0.33, 0.1, 0.3, 1) both,
+    pas 1.7s ease-in-out both;
+}
+@keyframes approche {
+  from { scale: 0.74; }
+  to { scale: 1; }
+}
+@keyframes pas {
+  0% { translate: 0 0; rotate: 0deg; }
+  12% { translate: 0 -0.55%; rotate: -0.3deg; }
+  25% { translate: 0 0.25%; rotate: 0deg; }
+  38% { translate: 0 -0.5%; rotate: 0.28deg; }
+  51% { translate: 0 0.2%; rotate: 0deg; }
+  64% { translate: 0 -0.35%; rotate: -0.18deg; }
+  78% { translate: 0 0.1%; rotate: 0deg; }
+  90% { translate: 0 -0.12%; rotate: 0.06deg; }
+  100% { translate: 0 0; rotate: 0deg; }
+}
+/* une fois la porte ouverte (1,05 s), on entre : le palier grandit et s'efface */
+.entree-appart[data-phase="ouverture"] .entree-scene {
+  transform: scale(2.6);
+  opacity: 0;
+  transition:
+    transform 1.15s cubic-bezier(0.55, 0, 0.25, 1) 1.05s,
+    opacity 0.7s ease 1.5s;
+}
+.entree-calque {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* le palier déborde du cadre 1600 × 1000 (vu de loin au début) */
+  overflow: visible;
+}
+.entree-porte {
+  position: absolute;
+  transform-origin: 0 50%;
+  transform: perspective(1400px) rotateY(0deg);
+  transition: transform 1.1s cubic-bezier(0.45, 0.05, 0.25, 1) 0.25s;
+}
+.entree-appart[data-phase="ouverture"] .entree-porte {
+  transform: perspective(1400px) rotateY(80deg);
+}
+.entree-ombre-porte {
+  position: absolute;
+  inset: 0;
+  background: #1c140f;
+  opacity: 0;
+  transition: opacity 1.1s ease 0.25s;
+}
+.entree-appart[data-phase="ouverture"] .entree-ombre-porte {
+  opacity: 0.45;
+}
+.entree-poignee {
+  position: absolute;
+  transform-origin: 68% 50%;
+}
+.entree-appart[data-phase="ouverture"] .entree-poignee {
+  animation: poignee 0.5s ease-in-out;
+}
+@keyframes poignee {
+  0%, 100% { transform: rotate(0deg); }
+  45%, 60% { transform: rotate(-28deg); }
+}
+/* l'applique s'allume en grésillant, la lumière du salon se répand en ouvrant */
+.entree-halo {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 214 150 / 0.75), rgb(255 180 100 / 0.25) 45%, rgb(255 160 80 / 0));
+  animation: allume 1.2s ease-out both;
+}
+@keyframes allume {
+  0% { opacity: 0; }
+  20% { opacity: 0.8; }
+  30% { opacity: 0.25; }
+  45%, 100% { opacity: 1; }
+}
+.entree-lumiere {
+  opacity: 0;
+  transition: opacity 0.9s ease 0.5s;
+}
+.entree-appart[data-phase="ouverture"] .entree-lumiere {
+  opacity: 1;
+}
+.entree-nuit {
+  opacity: 0;
+}
+.entree-appart[data-nuit="true"] .entree-nuit {
+  opacity: 0.42;
+}
+.entree-aide {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(5vh, 24px);
+  text-align: center;
+  color: var(--color-creme);
+  font-size: 0.95rem;
+  text-shadow: 0 1px 6px rgb(28 20 15 / 0.7);
+  animation: aide 0.8s ease 0.9s both;
+  transition: opacity 0.3s ease;
+}
+.entree-appart:not([data-phase="porte"]) .entree-aide {
+  opacity: 0;
+}
+@keyframes aide {
+  from { opacity: 0; transform: translateY(6px); }
+}
