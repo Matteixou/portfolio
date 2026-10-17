@@ -1,6 +1,5 @@
 import { memo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
 import { stream } from "@/data/stream";
-import type { Couleur, PostItPublic } from "@/lib/livre-dor";
 import { lieux } from "../lieux";
 import { Calque, placer, Vue, type Boite } from "./Calque";
 import type { ActionsScene } from "./types";
@@ -11,6 +10,7 @@ import type { ActionsScene } from "./types";
    - l'enseigne néon « mathsuo » (s'allume / s'éteint)
    - la lampe de studio (s'allume / s'éteint)
    - le tableau à lettres avec les horaires (décor)
+   - la porte du frigo, ses aimants et ses post-its (décor)
    ─────────────────────────────────────────────────────────────────────── */
 
 export const B_ECRAN = { x: 610, y: 390, w: 380, h: 206 };
@@ -428,25 +428,9 @@ export const ZoneClavier = memo(function ZoneClavier({ jouer }: { jouer: (touche
   );
 });
 
-/* ─── Le frigo et ses post-its : le livre d'or ─────────────────────── */
-
-export const TEINTES_POSTIT: Record<Couleur, string> = {
-  jaune: "#ffe58a",
-  rose: "#f9b4c4",
-  bleu: "#a8d8f0",
-  vert: "#bfe3a0",
-};
+/* ─── La porte du frigo : aimants, post-its griffonnés, crayon ─────── */
 
 const B_FRIGO: Boite = { x: 1436, y: 544, w: 152, h: 244 };
-/** emplacements sur la porte : x, y, inclinaison */
-const EMPLACEMENTS: [number, number, number][] = [
-  [1478, 620, -6],
-  [1530, 616, 5],
-  [1474, 668, 4],
-  [1528, 664, -4],
-  [1480, 716, -3],
-  [1530, 712, 6],
-];
 
 function PostItDessin({ x, y, r, teinte, lignes = 3 }: { x: number; y: number; r: number; teinte: string; lignes?: number }) {
   return (
@@ -463,61 +447,20 @@ function PostItDessin({ x, y, r, teinte, lignes = 3 }: { x: number; y: number; r
   );
 }
 
-export const Frigo = memo(function Frigo({
-  postits,
-  ouvrir,
-  survoler,
-}: Pick<ActionsScene, "ouvrir" | "survoler"> & { postits: PostItPublic[] }) {
-  const lieu = lieux["livre-dor"];
-  const visibles = postits.slice(0, EMPLACEMENTS.length - 1);
+export const Frigo = memo(function Frigo() {
   return (
-    <a
-      href="#livre-dor"
-      className="objet"
-      data-lieu="livre-dor"
-      style={placer(B_FRIGO)}
-      aria-label={`${lieu.objet} : ${lieu.titre}`}
-      aria-haspopup="dialog"
-      onClick={(e: MouseEvent) => {
-        e.preventDefault();
-        ouvrir("livre-dor");
-      }}
-      onPointerEnter={() => survoler("livre-dor")}
-      onPointerLeave={() => survoler(null)}
-      onFocus={() => survoler("livre-dor")}
-      onBlur={() => survoler(null)}
-    >
-      <Vue boite={B_FRIGO}>
-        {/* la porte, pour qu'on puisse cliquer partout dessus */}
-        <rect x="1440" y="548" width="134" height="236" rx="26" fill="transparent" />
-        {/* le mot de Matthieu, toujours en premier */}
-        <g transform={`rotate(${EMPLACEMENTS[0][2]} ${EMPLACEMENTS[0][0]} ${EMPLACEMENTS[0][1]})`}>
-          <rect x={EMPLACEMENTS[0][0] - 18} y={EMPLACEMENTS[0][1] - 17} width="38" height="38" rx="1.5" fill="#140c08" opacity="0.18" />
-          <rect x={EMPLACEMENTS[0][0] - 19} y={EMPLACEMENTS[0][1] - 19} width="38" height="38" rx="1.5" fill={TEINTES_POSTIT.jaune} />
-          <text x={EMPLACEMENTS[0][0]} y={EMPLACEMENTS[0][1] - 4} textAnchor="middle" className="font-main" fontSize="9.5" fill="#3a281d">
-            laissez
-          </text>
-          <text x={EMPLACEMENTS[0][0]} y={EMPLACEMENTS[0][1] + 6} textAnchor="middle" className="font-main" fontSize="9.5" fill="#3a281d">
-            un mot !
-          </text>
-          <text x={EMPLACEMENTS[0][0] + 9} y={EMPLACEMENTS[0][1] + 15} textAnchor="middle" fontSize="8" fill="#c2562f">
-            ♥
-          </text>
-        </g>
-        {visibles.map((p, i) => {
-          const [x, y, r] = EMPLACEMENTS[i + 1];
-          return <PostItDessin key={p.id} x={x} y={y} r={r} teinte={TEINTES_POSTIT[p.couleur]} lignes={2 + (p.message.length > 80 ? 1 : 0)} />;
-        })}
-        {/* aimants */}
-        <circle cx="1478" cy="602" r="5" fill="#c2562f" />
-        <circle cx="1546" cy="582" r="5" fill="#5cbcf2" />
-        {/* un crayon pendu à sa ficelle, pour écrire */}
-        <path d="M1560 610 C1566 640 1562 680 1566 724" fill="none" stroke="#efe3cf" strokeWidth="1" opacity="0.7" />
-        <g transform="rotate(8 1566 734)">
-          <rect x="1563" y="722" width="6" height="30" rx="1" fill="#d9a441" />
-          <path d="M1563 752 L1566 760 L1569 752 Z" fill="#3a281d" />
-        </g>
-      </Vue>
-    </a>
+    <Calque boite={B_FRIGO}>
+      <PostItDessin x={1478} y={620} r={-6} teinte="#ffe58a" />
+      <PostItDessin x={1530} y={668} r={5} teinte="#a8d8f0" lignes={2} />
+      {/* aimants */}
+      <circle cx="1478" cy="602" r="5" fill="#c2562f" />
+      <circle cx="1546" cy="582" r="5" fill="#5cbcf2" />
+      {/* un crayon pendu à sa ficelle */}
+      <path d="M1560 610 C1566 640 1562 680 1566 724" fill="none" stroke="#efe3cf" strokeWidth="1" opacity="0.7" />
+      <g transform="rotate(8 1566 734)">
+        <rect x="1563" y="722" width="6" height="30" rx="1" fill="#d9a441" />
+        <path d="M1563 752 L1566 760 L1569 752 Z" fill="#3a281d" />
+      </g>
+    </Calque>
   );
 });

@@ -112,7 +112,7 @@ export function StudioFond() {
   );
 }
 
-/** Le petit frigo rétro du studio (la porte, avec ses post-its, se touche) */
+/** Le petit frigo rétro du studio (aimants et post-its de la porte : objets-studio.tsx) */
 function Frigo() {
   return (
     <g>

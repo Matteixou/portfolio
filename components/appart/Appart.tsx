@@ -16,7 +16,6 @@ import APropos from "./pieces/APropos";
 import Atelier from "./pieces/Atelier";
 import Contact from "./pieces/Contact";
 import Krylos from "./pieces/Krylos";
-import LivreDor from "./pieces/LivreDor";
 import Musique from "./pieces/Musique";
 import Realisations from "./pieces/Realisations";
 import Stream from "./pieces/Stream";
@@ -30,7 +29,6 @@ import { arreterLofi, basculerLofi, gratterAccord, jouerArpege, jouerDisco, joue
 import { estLaNuit, useHeureParis, useMeteo } from "./useAmbiance";
 import { useEtatStream } from "./useEtatStream";
 import { usePeriode } from "./saisons";
-import { useLivreDor } from "./useLivreDor";
 
 /* ───────────────────────────────────────────────────────────────────────
    L'appartement : trois pièces côte à côte (le gymnase à gauche, le salon
@@ -159,7 +157,6 @@ export default function Appart() {
   const [choixNuit, setChoixNuit] = useState<boolean | null>(null);
   const nuit = choixNuit ?? nuitAuto;
   const meteo = useMeteo();
-  const livreDor = useLivreDor();
   const [lampes, setLampes] = useState<Record<Lampe, boolean>>({ lanterne: true, champignon: true, chevet: true });
   const [bougies, setBougies] = useState(true);
   const [neon, setNeon] = useState(true);
@@ -737,7 +734,7 @@ export default function Appart() {
               <Reperes piece="salon" />
             </div>
             <div className="piece studio" role="group" aria-label="Le studio de stream">
-              <Studio etat={etat} actions={actions} etatStream={etatStream} postits={livreDor.postits} />
+              <Studio etat={etat} actions={actions} etatStream={etatStream} />
               <Reperes piece="studio" />
             </div>
           </div>
@@ -814,9 +811,6 @@ export default function Appart() {
             joue={platine}
             ecouter={ecouterDisque}
           />
-        </Panneau>
-        <Panneau id="livre-dor" ouvert={ouvert === "livre-dor"} surtitre="le frigo du studio" titre="Le livre d'or" onFermer={fermer}>
-          <LivreDor postits={livreDor.postits} ouvert={livreDor.ouvert} />
         </Panneau>
         <Panneau id="stream" ouvert={ouvert === "stream"} surtitre="le studio, au fond à droite" titre="En live le week-end" onFermer={fermer}>
           <Stream etat={etatStream} />

@@ -1,6 +1,5 @@
 import { memo } from "react";
 import type { EtatStream } from "@/data/stream";
-import type { PostItPublic } from "@/lib/livre-dor";
 import { ImageSalon, PLEIN } from "./Calque";
 import { Ecrans, Enseigne, Frigo, Instruments, LampeOnAir, LampeStudio, TableauHoraires, ZoneClavier, ZoneCordes } from "./objets-studio";
 import { CitrouilleFrigo, GuirlandeStudio, LueurCitrouilleFrigo } from "./saisons";
@@ -17,12 +16,10 @@ export default memo(function Studio({
   etat,
   actions,
   etatStream,
-  postits,
 }: {
   etat: EtatScene;
   actions: ActionsScene;
   etatStream: EtatStream;
-  postits: PostItPublic[];
 }) {
   const { decor } = etat;
   return (
@@ -37,7 +34,7 @@ export default memo(function Studio({
       <Instruments ouvrir={actions.ouvrir} survoler={actions.survoler} accords={etat.accords} touches={etat.touches} />
       <ZoneCordes gratter={actions.gratter} />
       <ZoneClavier jouer={actions.jouerTouche} />
-      <Frigo postits={postits} ouvrir={actions.ouvrir} survoler={actions.survoler} />
+      <Frigo />
       {decor?.citrouilles && <CitrouilleFrigo />}
       {decor?.fanions && <FanionsStudio couleurs={decor.fanions} />}
 

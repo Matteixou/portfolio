@@ -14,7 +14,6 @@ trois pièces, dessiné à la main en SVG : le **gymnase** à gauche, le **salon
 | Salon | La lettre sur la table basse | Formulaire de contact | `#contact` |
 | Studio | Les écrans | Le stream (Twitch, le week-end de 21 h à minuit) | `#stream` |
 | Studio | La guitare et le clavier | La musique (8 ans de conservatoire, ce que j'écoute) | `#musique` |
-| Studio | Le frigo | Le livre d'or (post-its des visiteurs, relus avant publication) | `#livre-dor` |
 
 Pour le plaisir : la fenêtre et l'interrupteur font tomber la nuit (lune, tour Eiffel, projecteurs du gymnase),
 les lampes s'allument, les bougies se soufflent, le chat aime les caresses ; le joueur du gymnase saute et smashe
@@ -214,24 +213,6 @@ et renseigner `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` (et les mêmes vari
 de visiteurs). Créer une application sur [dev.twitch.tv/console](https://dev.twitch.tv/console) (gratuit, catégorie
 « Website », URL de redirection `http://localhost`), puis renseigner `TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET` dans
 `.env.local` et sur Vercel.
-
-## Livre d'or
-
-Un visiteur colle un post-it (pseudo, mot de 240 caractères, couleur) : il est enregistré « en attente » et un email
-part vers `CONTACT_TO` avec deux liens, **Publier** et **Refuser**. Chaque lien mène à une page de confirmation
-(les antivirus de messagerie ouvrent parfois les liens : rien n'est publié sans clic sur le bouton). Les liens sont
-signés, personne d'autre ne peut modérer. Les post-its publiés apparaissent sur le frigo (les 5 derniers) et dans
-le panneau.
-
-À configurer (dans `.env.local` et sur Vercel) :
-
-- `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN` : une base [Upstash Redis](https://upstash.com) gratuite
-  (sur Vercel, l'intégration Upstash les remplit toute seule) ;
-- `LIVRE_DOR_SECRET` : une longue chaîne aléatoire (`openssl rand -hex 32`).
-
-Sans Upstash, en local, les post-its vivent en mémoire ; sans Resend, les liens de modération s'affichent dans le
-terminal de `npm run dev`. En production, tant que ce n'est pas configuré, le livre d'or affiche « ouvre très
-bientôt ». Anti-spam : champ piège invisible et 3 post-its par heure et par visiteur (adresse IP hachée).
 
 ## Versions précédentes
 

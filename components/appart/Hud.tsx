@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Guitar, Sparkles, Timer, Volume2, VolumeX, Hand, StickyNote, Mail, MonitorPlay, Moon, Smile, Sun, Tv, Volleyball, Wrench, X, Image as Affiche } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Guitar, Sparkles, Timer, Volume2, VolumeX, Hand, Mail, MonitorPlay, Moon, Smile, Sun, Tv, Volleyball, Wrench, X, Image as Affiche } from "lucide-react";
 import Link from "next/link";
 import { memo, useEffect, useRef, useState, type MouseEvent } from "react";
 import { krylos } from "@/data/krylos";
@@ -139,7 +139,6 @@ const ICONES: Record<LieuId, typeof Tv> = {
   stream: MonitorPlay,
   volley: Volleyball,
   musique: Guitar,
-  "livre-dor": StickyNote,
 };
 
 /** Libellés courts du plan, pour que tout tienne sur un téléphone */
@@ -152,7 +151,6 @@ const COURT: Record<LieuId, string> = {
   stream: "Stream",
   volley: "Volley",
   musique: "Musique",
-  "livre-dor": "Post-it",
 };
 
 export const Plan = memo(function Plan({

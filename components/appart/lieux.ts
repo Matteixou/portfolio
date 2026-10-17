@@ -7,7 +7,7 @@
    ─────────────────────────────────────────────────────────────────────── */
 
 /* Dans l'ordre du plan : de la pièce de gauche à celle de droite */
-export const LIEUX = ["volley", "realisations", "krylos", "atelier", "a-propos", "contact", "stream", "musique", "livre-dor"] as const;
+export const LIEUX = ["volley", "realisations", "krylos", "atelier", "a-propos", "contact", "stream", "musique"] as const;
 
 /** De gauche à droite. On arrive dans le salon. */
 export const PIECES = ["gymnase", "salon", "studio"] as const;
@@ -100,15 +100,6 @@ export const lieux: Record<LieuId, Lieu> = {
     repere: { x: 230, y: 506 },
     indice: { x: 392, y: 530 },
     cadrage: { x: 240, y: 660, w: 440, h: 320 },
-  },
-  "livre-dor": {
-    piece: "studio",
-    objet: "Le frigo",
-    titre: "Le livre d'or",
-    etiquette: "laissez un post-it !",
-    repere: { x: 1512, y: 492 },
-    indice: { x: 1586, y: 560 },
-    cadrage: { x: 1430, y: 660, w: 420, h: 320 },
   },
 };
 
