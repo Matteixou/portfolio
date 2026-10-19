@@ -70,6 +70,36 @@ export function creneauDuStream(date = new Date()): Creneau {
   return { enCreneau: false, prochain: "ce week-end" };
 }
 
+/** Le prochain créneau : son jour (0-6) et les minutes avant son début ;
+    null pendant le créneau */
+export function avantLeLive(date = new Date()): { jour: number; minutes: number } | null {
+  const { jour, heure, minute } = maintenantAParis(date);
+  if (stream.jours.includes(jour) && heure >= stream.debut && heure < stream.fin) return null;
+  for (let dans = 0; dans < 8; dans++) {
+    const j = (jour + dans) % 7;
+    if (!stream.jours.includes(j)) continue;
+    if (dans === 0 && heure >= stream.debut) continue;
+    return { jour: j, minutes: dans * 1440 + stream.debut * 60 - (heure * 60 + minute) };
+  }
+  return null;
+}
+
+/** « 2 j 5 h », « 3 h 20 », « 12 min » */
+export function dureeLisible(minutes: number) {
+  if (minutes >= 1440) return `${Math.floor(minutes / 1440)} j ${Math.floor((minutes % 1440) / 60)} h`;
+  if (minutes >= 60) return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")}`;
+  return `${Math.max(1, minutes)} min`;
+}
+
+/** Le jour (0-6) à Paris */
+export const jourAParis = (date = new Date()) => maintenantAParis(date).jour;
+
+/** « Samedi », « Dimanche »… */
+export const nomDuJour = (j: number) => NOMS_JOURS[j].charAt(0).toUpperCase() + NOMS_JOURS[j].slice(1);
+
+/** « 21 h – minuit » */
+export const plageDuLive = `${stream.debut} h – ${stream.fin === 24 ? "minuit" : `${stream.fin} h`}`;
+
 /** La phrase du bandeau des écrans : en direct, bientôt, ou le prochain créneau */
 export function phraseDuLive(e: EtatStream) {
   if (e.reel && e.enDirect) {

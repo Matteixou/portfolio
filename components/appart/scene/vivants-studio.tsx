@@ -1,5 +1,5 @@
-import { memo } from "react";
-import { phraseDuLive, stream, type EtatStream } from "@/data/stream";
+import { memo, useSyncExternalStore } from "react";
+import { avantLeLive, dureeLisible, jourAParis, nomDuJour, phraseDuLive, plageDuLive, stream, type EtatStream } from "@/data/stream";
 import { Calque, Halo, placer, Vue, type Boite } from "./Calque";
 import { alea } from "./Defs";
 import { B_CHAT, B_ECRAN, B_NEON, B_ONAIR, B_PANNEAU, TexteNeon } from "./objets-studio";
@@ -118,6 +118,131 @@ const raccourcir = (texte: string, n: number) => (texte.length > n ? `${texte.sl
 
 const B_CHAT_DOUBLE: Boite = { x: B_CHAT.x, y: B_CHAT.y, w: B_CHAT.w, h: B_CHAT.h * 2 };
 
+/* L'heure qui avance, minute par minute (pour le compte à rebours). Le
+   studio n'est construit que dans le navigateur : pas d'écart avec le
+   rendu du serveur. */
+function abonnerMinute(prevenir: () => void) {
+  const id = window.setInterval(prevenir, 30_000);
+  return () => window.clearInterval(id);
+}
+const minuteActuelle = () => Math.floor(Date.now() / 60_000);
+const useMinute = () => useSyncExternalStore(abonnerMinute, minuteActuelle, () => 0);
+
+/** Petites étoiles du fond, toujours à la même place */
+const ETOILES = (() => {
+  const r = alea(47);
+  return Array.from({ length: 18 }, () => ({ dx: 6 + r() * 368, dy: 18 + r() * 158, r: 0.5 + r() * 0.9, o: 0.25 + r() * 0.5 }));
+})();
+
+/* L'écran de pause, quand le live n'a pas lieu : le logo, le prochain live
+   avec un compte à rebours, le planning du week-end et les jeux au programme */
+function EcranPause({ etat }: { etat: EtatStream }) {
+  useMinute();
+  const { x, y } = B_ECRAN;
+  const avant = avantLeLive();
+  // c'est l'heure du créneau, mais Twitch ne voit pas encore le live
+  const bientot = avant === null || etat.enCreneau;
+  const quand = bientot ? "C'est l'heure !" : etat.prochain.charAt(0).toUpperCase() + etat.prochain.slice(1);
+  const compte = bientot ? "il démarre dans un instant" : `dans ${dureeLisible(avant.minutes)}`;
+  const largeurCompte = compte.length * 4.3 + 16;
+  return (
+    <g className="font-sans">
+      {/* lueurs et étoiles */}
+      <circle cx={x + 92} cy={y + 66} r="96" fill="url(#g-pause-rose)" />
+      <circle cx={x + 318} cy={y + 150} r="120" fill="url(#g-pause-violet)" />
+      <g fill="#fff">
+        {ETOILES.map((e, i) => (
+          <circle key={i} cx={x + e.dx} cy={y + e.dy} r={e.r} opacity={e.o} />
+        ))}
+      </g>
+      {/* pastille : hors ligne, ou bientôt */}
+      <rect
+        x={x + 18}
+        y={y + 24}
+        width={bientot ? 50 : 62}
+        height="13"
+        rx="6.5"
+        fill={bientot ? "#f7c987" : "#ffffff"}
+        fillOpacity={bientot ? 0.2 : 0.08}
+        stroke={bientot ? "#f7c987" : "#ffffff"}
+        strokeOpacity={bientot ? 0.9 : 0.2}
+        strokeWidth="0.8"
+      />
+      <circle cx={x + 26} cy={y + 30.5} r="2.3" fill={bientot ? "#f7c987" : "#8d84a0"} />
+      <text x={x + 31.5} y={y + 33.4} fontSize="6.6" fontWeight="800" letterSpacing="0.6" fill={bientot ? "#ffe2b0" : "#d9d2e6"}>
+        {bientot ? "BIENTÔT" : "HORS LIGNE"}
+      </text>
+      {/* le logo, avec un halo dessiné (pas de filtre : trop cher à animer) */}
+      <text x={x + 17} y={y + 76} className="font-main" fontSize="38" fill="none" stroke="#ff8fcf" strokeWidth="4" strokeOpacity="0.22" strokeLinejoin="round">
+        {stream.pseudo}
+      </text>
+      <text x={x + 17} y={y + 76} className="font-main" fontSize="38" fill="url(#g-pause-logo)">
+        {stream.pseudo}
+      </text>
+      <text x={x + 19} y={y + 91} fontSize="8.2" fill="#cfc4e3">
+        {bientot ? "Installez-vous, ça commence !" : "Le stream fait une pause. À très vite !"}
+      </text>
+      <path d={`M${x + 19} ${y + 103} H${x + 150}`} stroke="#ffffff" strokeOpacity="0.12" />
+      {/* le prochain live */}
+      <text x={x + 19} y={y + 117} fontSize="6.6" fontWeight="800" letterSpacing="1" fill="#f7c987">
+        PROCHAIN LIVE
+      </text>
+      <text x={x + 19} y={y + 135} fontSize="16" fontWeight="700" fill="#ffffff">
+        {quand}
+      </text>
+      <rect x={x + 19} y={y + 142} width={largeurCompte} height="14" rx="7" fill="#9146ff" fillOpacity="0.28" stroke="#a970ff" strokeWidth="0.8" />
+      <text x={x + 19 + largeurCompte / 2} y={y + 151.6} textAnchor="middle" fontSize="7.4" fontWeight="600" fill="#ece3ff">
+        {compte}
+      </text>
+      {/* le planning du week-end */}
+      <rect x={x + 232} y={y + 24} width="134" height="146" rx="6" fill="#120e1a" fillOpacity="0.72" stroke="#ffffff" strokeOpacity="0.08" />
+      <text x={x + 244} y={y + 40} fontSize="6.6" fontWeight="800" letterSpacing="1" fill="#f7c987">
+        LE WEEK-END
+      </text>
+      {stream.jours.map((j, i) => {
+        // le prochain jour de live en violet ; à l'heure du live, aujourd'hui en ambre
+        const prochain = !bientot && avant?.jour === j;
+        const ceSoir = bientot && jourAParis() === j;
+        const ry = y + 47 + i * 22;
+        return (
+          <g key={j}>
+            <rect
+              x={x + 244}
+              y={ry}
+              width="112"
+              height="18"
+              rx="4"
+              fill={prochain ? "#9146ff" : ceSoir ? "#f7c987" : "#ffffff"}
+              fillOpacity={prochain || ceSoir ? 1 : 0.06}
+            />
+            <text x={x + 251} y={ry + 12} fontSize="8" fontWeight="700" fill={ceSoir ? "#2b1d16" : "#ffffff"}>
+              {nomDuJour(j)}
+            </text>
+            <text x={x + 350} y={ry + 12} textAnchor="end" fontSize="7.2" fill={ceSoir ? "#2b1d16" : prochain ? "#ffffff" : "#cfc4e3"}>
+              {plageDuLive}
+            </text>
+          </g>
+        );
+      })}
+      <text x={x + 244} y={y + 106} fontSize="6.6" fontWeight="800" letterSpacing="1" fill="#f7c987">
+        AU PROGRAMME
+      </text>
+      {stream.contenus.slice(0, 4).map((c, i) => {
+        const cx = x + 244 + (i % 2) * 58;
+        const cy = y + 113 + Math.floor(i / 2) * 19;
+        return (
+          <g key={c}>
+            <rect x={cx} y={cy} width="54" height="14" rx="7" fill="#ffffff" fillOpacity="0.08" stroke="#c9a8ff" strokeOpacity="0.35" strokeWidth="0.6" />
+            <text x={cx + 27} y={cy + 9.6} textAnchor="middle" fontSize="6.4" fill="#e4d6ff">
+              {c}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 export const EcransStudio = memo(function EcransStudio({ etat }: { etat: EtatStream }) {
   const { x, y, w, h } = B_ECRAN;
   return (
@@ -134,6 +259,18 @@ export const EcransStudio = memo(function EcransStudio({ etat }: { etat: EtatStr
             <stop offset="0.45" stopColor="#7a3fb0" />
             <stop offset="1" stopColor="#1b1430" />
           </radialGradient>
+          <radialGradient id="g-pause-rose">
+            <stop offset="0" stopColor="#ff6fb5" stopOpacity="0.32" />
+            <stop offset="1" stopColor="#ff6fb5" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="g-pause-violet">
+            <stop offset="0" stopColor="#8a4fd0" stopOpacity="0.4" />
+            <stop offset="1" stopColor="#8a4fd0" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="g-pause-logo" x1="0" y1="0" x2="1" y2="0.4">
+            <stop offset="0" stopColor="#ffd1e6" />
+            <stop offset="1" stopColor="#c9a8ff" />
+          </linearGradient>
         </defs>
         <rect x={x} y={y} width={w} height={h} rx="3" fill="url(#g-ecran-stream)" />
         {/* barre du logiciel de stream */}
@@ -144,57 +281,11 @@ export const EcransStudio = memo(function EcransStudio({ etat }: { etat: EtatStr
         <text x={x + w / 2} y={y + 10} textAnchor="middle" className="font-mono" fontSize="7" fill="#b9aed0">
           {`studio — ${stream.pseudo}`}
         </text>
-        {/* l'image du stream */}
-        <rect x={x + 10} y={y + 22} width="270" height="152" rx="3" fill="url(#g-jeu)" />
-        <g stroke="#fff" strokeWidth="1.6" opacity="0.85">
-          <path d={`M${x + 145} ${y + 90} h-8 M${x + 145} ${y + 90} h8 M${x + 145} ${y + 90} v-8 M${x + 145} ${y + 90} v8`} />
-        </g>
-        <path d={`M${x + 10} ${y + 160} L${x + 70} ${y + 128} L${x + 110} ${y + 150} L${x + 170} ${y + 118} L${x + 280} ${y + 160} V${y + 174} H${x + 10} Z`} fill="#1b1430" opacity="0.8" />
-        {/* la webcam, en incrustation */}
-        <rect x={x + 214} y={y + 118} width="60" height="50" rx="3" fill="#2a2036" stroke="#c9a8ff" strokeWidth="1.2" />
-        <circle cx={x + 244} cy={y + 138} r="9" fill="#e9b48c" />
-        <path d={`M${x + 234} ${y + 134} C${x + 234} ${y + 122} ${x + 254} ${y + 122} ${x + 254} ${y + 134}`} fill="#2b1d16" />
-        <path d={`M${x + 232} ${y + 140} C${x + 230} ${y + 124} ${x + 258} ${y + 124} ${x + 256} ${y + 140}`} fill="none" stroke="#1b181d" strokeWidth="3" />
-        <path d={`M${x + 226} ${y + 168} C${x + 228} ${y + 152} ${x + 260} ${y + 152} ${x + 262} ${y + 168} Z`} fill="#1b181d" />
-        {/* statut du live */}
-        {etat.enDirect ? (
-          <g>
-            <rect x={x + 16} y={y + 28} width="62" height="14" rx="3" fill="#e5352b" />
-            <circle cx={x + 24} cy={y + 35} r="2.6" fill="#fff" className="anim-direct" />
-            <text x={x + 30} y={y + 38.5} className="font-sans" fontSize="8" fontWeight="800" fill="#fff">
-              EN DIRECT
-            </text>
-          </g>
-        ) : (
-          <g>
-            <rect x={x + 16} y={y + 28} width="68" height="14" rx="3" fill="#3a3346" />
-            <text x={x + 24} y={y + 38.5} className="font-sans" fontSize="8" fontWeight="800" fill="#d9d2e6">
-              HORS LIGNE
-            </text>
-          </g>
-        )}
-        {/* colonne de droite : le programme */}
-        <text x={x + 292} y={y + 34} className="font-main" fontSize="16" fill="#ffd1e6">
-          {stream.pseudo}
-        </text>
-        <g className="font-sans" fontSize="7.5" fill="#cfc4e3">
-          {stream.contenus.slice(0, 4).map((c, i) => (
-            <text key={c} x={x + 292} y={y + 54 + i * 12}>
-              {`· ${c}`}
-            </text>
-          ))}
-        </g>
-        {/* en live : le jeu du moment (statut Twitch réel) ; sinon, les horaires */}
-        <text x={x + 292} y={y + 120} className="font-sans" fontSize="7.5" fontWeight="700" fill="#f7c987">
-          {etat.reel && etat.enDirect ? "EN CE MOMENT" : "LE WEEK-END"}
-        </text>
-        <text x={x + 292} y={y + 131} className="font-sans" fontSize="7.5" fill="#f7c987">
-          {etat.reel && etat.enDirect ? raccourcir(etat.jeu ?? "En direct", 17) : "21 h – minuit"}
-        </text>
+        {etat.enDirect ? <ImageDuLive etat={etat} /> : <EcranPause etat={etat} />}
         {/* bandeau du bas */}
         <rect x={x} y={y + h - 26} width={w} height="26" fill="#120e1a" />
         <text x={x + 12} y={y + h - 10} className="font-sans" fontSize="9" fill="#efe8fa">
-          {phraseDuLive(etat)}
+          {etat.enDirect || etat.enCreneau ? phraseDuLive(etat) : "Suivez la chaîne pour ne rien rater"}
         </text>
         <text x={x + w - 12} y={y + h - 10} textAnchor="end" className="font-mono" fontSize="8" fill="#c9a8ff">
           {stream.displayUrl}
@@ -215,3 +306,50 @@ export const EcransStudio = memo(function EcransStudio({ etat }: { etat: EtatStr
     </>
   );
 });
+
+/* En direct : l'image du jeu, la webcam en incrustation et le programme */
+function ImageDuLive({ etat }: { etat: EtatStream }) {
+  const { x, y } = B_ECRAN;
+  return (
+    <>
+        {/* l'image du stream */}
+        <rect x={x + 10} y={y + 22} width="270" height="152" rx="3" fill="url(#g-jeu)" />
+        <g stroke="#fff" strokeWidth="1.6" opacity="0.85">
+          <path d={`M${x + 145} ${y + 90} h-8 M${x + 145} ${y + 90} h8 M${x + 145} ${y + 90} v-8 M${x + 145} ${y + 90} v8`} />
+        </g>
+        <path d={`M${x + 10} ${y + 160} L${x + 70} ${y + 128} L${x + 110} ${y + 150} L${x + 170} ${y + 118} L${x + 280} ${y + 160} V${y + 174} H${x + 10} Z`} fill="#1b1430" opacity="0.8" />
+        {/* la webcam, en incrustation */}
+        <rect x={x + 214} y={y + 118} width="60" height="50" rx="3" fill="#2a2036" stroke="#c9a8ff" strokeWidth="1.2" />
+        <circle cx={x + 244} cy={y + 138} r="9" fill="#e9b48c" />
+        <path d={`M${x + 234} ${y + 134} C${x + 234} ${y + 122} ${x + 254} ${y + 122} ${x + 254} ${y + 134}`} fill="#2b1d16" />
+        <path d={`M${x + 232} ${y + 140} C${x + 230} ${y + 124} ${x + 258} ${y + 124} ${x + 256} ${y + 140}`} fill="none" stroke="#1b181d" strokeWidth="3" />
+        <path d={`M${x + 226} ${y + 168} C${x + 228} ${y + 152} ${x + 260} ${y + 152} ${x + 262} ${y + 168} Z`} fill="#1b181d" />
+        {/* statut du live */}
+        <g>
+          <rect x={x + 16} y={y + 28} width="62" height="14" rx="3" fill="#e5352b" />
+          <circle cx={x + 24} cy={y + 35} r="2.6" fill="#fff" className="anim-direct" />
+          <text x={x + 30} y={y + 38.5} className="font-sans" fontSize="8" fontWeight="800" fill="#fff">
+            EN DIRECT
+          </text>
+        </g>
+        {/* colonne de droite : le programme */}
+        <text x={x + 292} y={y + 34} className="font-main" fontSize="16" fill="#ffd1e6">
+          {stream.pseudo}
+        </text>
+        <g className="font-sans" fontSize="7.5" fill="#cfc4e3">
+          {stream.contenus.slice(0, 4).map((c, i) => (
+            <text key={c} x={x + 292} y={y + 54 + i * 12}>
+              {`· ${c}`}
+            </text>
+          ))}
+        </g>
+        {/* le jeu du moment (statut Twitch réel) ; sinon, les horaires */}
+        <text x={x + 292} y={y + 120} className="font-sans" fontSize="7.5" fontWeight="700" fill="#f7c987">
+          {etat.reel ? "EN CE MOMENT" : "LE WEEK-END"}
+        </text>
+        <text x={x + 292} y={y + 131} className="font-sans" fontSize="7.5" fill="#f7c987">
+          {etat.reel ? raccourcir(etat.jeu ?? "En direct", 17) : plageDuLive}
+        </text>
+    </>
+  );
+}

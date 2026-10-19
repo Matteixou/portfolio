@@ -236,6 +236,11 @@ de visiteurs). Créer une application sur [dev.twitch.tv/console](https://dev.tw
 « Website », URL de redirection `http://localhost`), puis renseigner `TWITCH_CLIENT_ID` et `TWITCH_CLIENT_SECRET` dans
 `.env.local` et sur Vercel.
 
+L'écran principal du studio suit ce statut (`EcransStudio`, `scene/vivants-studio.tsx`) : en direct, l'image du
+jeu, la webcam et le jeu du moment ; sinon, un écran de pause de streamer (logo, prochain live avec compte à
+rebours, planning du week-end avec le prochain jour en violet, jeux au programme) ; à l'heure du créneau sans live
+détecté, la variante « Bientôt » (jour en cours en ambre). Pour essayer : `?live=Valorant` ou `?live=0`.
+
 ## Versions précédentes
 
 Sauvegardées à côté du projet : `../_sauvegarde-avant-appart-2026-10-15/` et `../_sauvegarde-avant-cocooning-2026-10-15/`.
