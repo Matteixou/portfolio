@@ -1,7 +1,7 @@
 "use client";
 
 import { MoveHorizontal } from "lucide-react";
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { memo, startTransition, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { projets } from "@/data/projets";
 import { AnnonceSecret, Accueil, BoutonSon, CompteurSecrets, EnDirect, Interrupteur, Passage, Plan } from "./Hud";
 import Disco, { DUREE_DISCO } from "./Disco";
@@ -202,11 +202,33 @@ export default function Appart() {
     }
   }, []);
 
+  /* ─── Les pièces construites ───
+     Au chargement, seulement celle où l'on arrive (le salon, ou celle d'un
+     lien partagé) : sur un téléphone modeste, construire les trois pièces
+     d'un coup gelait la page plusieurs secondes. Les autres viennent dès que
+     le navigateur a un moment (par petits morceaux, startTransition), ou tout
+     de suite si l'on se dirige vers elles. Le contenant de chaque pièce, lui,
+     existe toujours (taille, défilement, détection de visibilité). */
+  const [montees, setMontees] = useState<readonly PieceId[]>(["salon"]);
+  const monter = useCallback((pieces: readonly PieceId[] = PIECES) => {
+    setMontees((m) => (pieces.every((p) => m.includes(p)) ? m : PIECES.filter((p) => m.includes(p) || pieces.includes(p))));
+  }, []);
+  useEffect(() => {
+    const tout = () => startTransition(() => monter());
+    if (typeof requestIdleCallback === "function") {
+      const id = requestIdleCallback(tout, { timeout: 2500 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(tout, 1200);
+    return () => window.clearTimeout(id);
+  }, [monter]);
+
   /* ─── Aller d'une pièce à l'autre (défilement doux) ─── */
   const allerA = useCallback((piece: PieceId, instantane = false) => {
     const plateau = plateauRef.current;
     const appart = appartRef.current;
     if (!plateau || !appart) return Promise.resolve();
+    monter([piece]);
     const cible = defilementPour(plateau, appart, piece);
     if (Math.abs(plateau.scrollLeft - cible) < 2) return Promise.resolve();
     // la pièce d'arrivée se réveille avant le départ, pas en plein mouvement
@@ -232,7 +254,7 @@ export default function Appart() {
       const secours = window.setTimeout(finir, 1400);
       plateau.addEventListener("scrollend", finir);
     });
-  }, []);
+  }, [monter]);
 
   /* ─── Ouvrir / fermer un coin de l'appartement ─── */
   const ouvrirLieu = useCallback(
@@ -502,6 +524,8 @@ export default function Appart() {
   const surDefilement = () => {
     const plateau = plateauRef.current;
     const appart = appartRef.current;
+    // on glisse vers une pièce pas encore construite : on la construit
+    if (montees.length < PIECES.length) monter();
     if (plateau && appart) {
       const p = pieceVisible(plateau, appart);
       if (p !== pieceVue) setPieceVue(p);
@@ -676,6 +700,9 @@ export default function Appart() {
     [nuit, lampes, bougies, chaine, zap, caresses, souffle, neon, lampeStudio, accords, touches, platine, decor],
   );
   const visiteEnCours = ouvert !== null;
+  // une pièce est construite si elle l'a déjà été, si on la regarde, ou si
+  // l'objet ouvert s'y trouve (lien partagé vers #stream, #volley…)
+  const construite = (p: PieceId) => montees.includes(p) || pieceVue === p || (ouvert !== null && lieux[ouvert].piece === p);
 
   return (
     <>
@@ -726,16 +753,27 @@ export default function Appart() {
             data-glitch={glitch}
           >
             <div className="piece gymnase" role="group" aria-label="Le gymnase">
-              <Gymnase actions={actions} />
-              <Reperes piece="gymnase" />
+              {construite("gymnase") && (
+                <>
+                  <Gymnase actions={actions} />
+                  <Reperes piece="gymnase" />
+                </>
+              )}
             </div>
             <div className="piece salon" role="group" aria-label="Le salon">
-              <Scene etat={etat} actions={actions} />
-              <Reperes piece="salon" />
+              {/* hydraté à part : la page répond aux premiers gestes plus tôt */}
+              <Suspense fallback={null}>
+                <Scene etat={etat} actions={actions} />
+                <Reperes piece="salon" />
+              </Suspense>
             </div>
             <div className="piece studio" role="group" aria-label="Le studio de stream">
-              <Studio etat={etat} actions={actions} etatStream={etatStream} />
-              <Reperes piece="studio" />
+              {construite("studio") && (
+                <>
+                  <Studio etat={etat} actions={actions} etatStream={etatStream} />
+                  <Reperes piece="studio" />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -785,6 +823,8 @@ export default function Appart() {
           />
         )}
 
+        {/* les panneaux (fermés au chargement) sont hydratés à part, eux aussi */}
+        <Suspense fallback={null}>
         <Panneau id="realisations" ouvert={ouvert === "realisations"} surtitre="à la télé ce soir" titre="Mes réalisations" onFermer={fermer}>
           <Realisations chaine={chaine} zapper={zapper} />
         </Panneau>
@@ -815,6 +855,7 @@ export default function Appart() {
         <Panneau id="stream" ouvert={ouvert === "stream"} surtitre="le studio, au fond à droite" titre="En live le week-end" onFermer={fermer}>
           <Stream etat={etatStream} />
         </Panneau>
+        </Suspense>
       </main>
     </>
   );

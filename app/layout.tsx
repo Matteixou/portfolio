@@ -66,11 +66,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* Avec JavaScript, l'appartement prend la main sur les ancres #lieu.
             Pas d'animation d'entrée (le palier) pour un lien direct, une deuxième
             visite dans la session ou si le visiteur préfère moins d'animations :
-            décidé ici, avant le premier affichage, pour ne rien voir clignoter. */}
+            décidé ici, avant le premier affichage, pour ne rien voir clignoter.
+            Un appareil qui se déclare modeste (2 Go de mémoire ou moins,
+            économie de données) passe aussi en mode léger dès maintenant et
+            entre directement dans le salon (voir components/appart/qualite.ts). */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "var d=document.documentElement;d.classList.add('js');try{if(location.pathname!=='/'||location.hash.length>1||sessionStorage.getItem('appart:entree')||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('sans-entree')}catch(e){d.classList.add('sans-entree')}",
+              "var d=document.documentElement;d.classList.add('js');try{var n=navigator,q=location.search,l=(n.deviceMemory&&n.deviceMemory<=2)||(n.connection&&n.connection.saveData)||/[?&]leger=1/.test(q);if(/[?&]leger=0/.test(q))l=false;if(l)d.setAttribute('data-leger','true');if(l||location.pathname!=='/'||location.hash.length>1||sessionStorage.getItem('appart:entree')||matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('sans-entree')}catch(e){d.classList.add('sans-entree')}",
           }}
         />
       </head>

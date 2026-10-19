@@ -164,11 +164,28 @@ Règles de fluidité, apprises en mesurant (à respecter quand on ajoute quelque
   par la carte graphique) au lieu d'écrire la position 120 fois par seconde ; les yeux du chat suivent le
   curseur 25 fois par seconde. Mesuré : −29 % de travail du thread principal en bougeant la souris, survol
   d'un objet ~430 → ~160 ms de travail.
+- **Chargement léger, pour les téléphones modestes** (mesuré avec un processeur ralenti ×6) :
+  - seule la pièce d'arrivée est construite au chargement ; le gymnase et le studio viennent dès que le navigateur
+    a un moment (`requestIdleCallback` + `startTransition`, en petits morceaux), ou tout de suite si l'on glisse
+    vers eux ou qu'un lien partagé y mène (`montees` / `construite()` dans `Appart.tsx`) ;
+  - le salon et les panneaux sont hydratés à part (`<Suspense>`) : la page répond plus tôt aux premiers gestes ;
+  - un panneau fermé n'est pas mis en page (`content-visibility: hidden`, qui s'endort après la fin du glissement
+    grâce à `transition … allow-discrete`) ;
+  - résultat : thread bloqué 5,3 → 3,8 s, plus longue tâche 2,2 → 1,1 s au chargement ; à-coups à l'ouverture d'un
+    panneau sur iPhone 105 → 26 ms.
+- **Calques de parallaxe isolés seulement à la souris** (`will-change` sous `(hover: hover) and (pointer: fine)`) :
+  au doigt ou en mode léger, ils ne servent à rien. Attention à l'effet d'avalanche : un calque isolé de la taille
+  d'une pièce force à isoler tout ce qui le chevauche par-dessus. (Pour juger la mémoire graphique, mesurer les
+  tuiles réellement dessinées — `memory-infra`, `cc/tile_memory` — pas la surface des calques : sur téléphone,
+  ~35 Mo de tuiles pour ~90 Mpx de calques.)
 - **Qualité adaptative** (`components/appart/qualite.ts`) : pendant les premiers gestes, on compte les images
   ratées ; si l'appareil décroche nettement (3 mesures sur 6 avec plus de 30 % d'images ratées), le site
   passe en « léger » pour la session : sans parallaxe, sans lueur floue au survol (léger soulèvement à la
   place), sans poussière, oiseaux, feuilles lointaines, lucioles ; nuages et lueurs figés. Rien n'est mesuré
-  pendant l'arrivée ni dans les 3 s qui suivent. Pour essayer : `?leger=1` (forcé) ou `?leger=0`.
+  pendant l'arrivée ni dans les 3 s qui suivent. Un appareil qui se déclare modeste (`navigator.deviceMemory`
+  ≤ 2 Go, ou économie de données) est en léger d'emblée et entre directement dans le salon, sans l'arrivée
+  animée : décidé par le script du `<head>` (`app/layout.tsx`), avant le premier affichage. Pour essayer :
+  `?leger=1` (forcé) ou `?leger=0`.
 - **Pas de lecture de mise en page à chaque image** (largeur de la pièce, position du chat : gardées en mémoire).
 - **Animations CSS toujours nommées en entier** : le CSS compilé vide un raccourci `animation:` sans nom.
 - **La toute première ouverture d'un panneau** dans un navigateur neuf marque un temps (~150-250 ms sur une carte

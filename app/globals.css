@@ -303,11 +303,19 @@ body {
 }
 
 /* Parallaxe : ces calques sont déplacés par JavaScript (transform seul).
+   Seulement à la souris : ailleurs (doigt, mode léger), les isoler ne sert
+   à rien et coûte très cher. Ils font la taille d'une pièce, et tout ce qui
+   est dessiné par-dessus et les chevauche doit alors être isolé aussi :
+   sur téléphone (densité 3), ~370 Mo de mémoire graphique au lieu de ~100.
    Pendant la visite d'un objet, on les laisse se redessiner nets au zoom. */
-.prl-ciel,
-.prl-avant {
-  will-change: transform;
+@media (hover: hover) and (pointer: fine) {
+  .prl-ciel,
+  .prl-avant {
+    will-change: transform;
+  }
 }
+[data-leger="true"] .prl-ciel,
+[data-leger="true"] .prl-avant,
 .appartement[data-cadre="true"] .prl-ciel,
 .appartement[data-cadre="true"] .prl-avant {
   will-change: auto;
@@ -1086,17 +1094,23 @@ body {
 
 /* Panneaux : à gauche sur ordinateur (les objets à visiter sont tous du
    côté droit de la pièce), en tiroir sur mobile */
+/* Fermé, son contenu n'est même pas mis en page (content-visibility) : au
+   chargement, c'est autant de texte en moins à calculer (sur un téléphone
+   lent, la mise en page des neuf panneaux coûtait plus d'une seconde).
+   Comme visibility, il ne s'endort qu'une fois le panneau sorti. */
 .panneau {
   position: fixed;
   z-index: 30;
   display: flex;
   flex-direction: column;
   visibility: hidden;
+  content-visibility: hidden;
   opacity: 0;
   transition:
     transform 0.7s cubic-bezier(0.65, 0, 0.25, 1),
     opacity 0.45s ease,
-    visibility 0s linear 0.7s;
+    visibility 0s linear 0.7s,
+    content-visibility 0s linear 0.7s allow-discrete;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1106,12 +1120,14 @@ body {
 }
 .panneau[data-ouvert="true"] {
   visibility: visible;
+  content-visibility: visible;
   opacity: 1;
   transform: none;
   transition:
     transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s,
     opacity 0.45s ease 0.2s,
-    visibility 0s linear 0s;
+    visibility 0s linear 0s,
+    content-visibility 0s linear 0s allow-discrete;
 }
 @media (min-width: 900px) {
   .panneau {
@@ -1129,6 +1145,7 @@ body {
 /* Sans JavaScript : les liens #ancre ouvrent quand même les panneaux */
 html:not(.js) .panneau:target {
   visibility: visible;
+  content-visibility: visible;
   opacity: 1;
   transform: none;
 }

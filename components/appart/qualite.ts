@@ -5,7 +5,8 @@
    animations d'ambiance (poussière, oiseaux, nuages, feuilles, lueurs).
    Les appareils qui suivent gardent tout.
 
-   Mesuré, pas deviné : pendant les premiers gestes (souris, défilement,
+   D'emblée si l'appareil se déclare modeste (2 Go de mémoire ou moins,
+   économie de données). Sinon, mesuré : pendant les premiers gestes (souris, défilement,
    ouverture d'un coin), on compte les images ratées sur ~1 s, au plus six
    fois. Trois mesures franchement mauvaises → léger, pour toute la session
    (pas au-delà : une première visite paie aussi la mise en route de la
@@ -38,10 +39,17 @@ function alleger(retenir: boolean) {
   window.dispatchEvent(new Event("appart:leger"));
 }
 
+/** L'appareil se déclare modeste (Chrome, Edge, Android) : peu de mémoire,
+    ou le visiteur a demandé d'économiser les données */
+function appareilModeste() {
+  const n = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  return (n.deviceMemory !== undefined && n.deviceMemory <= 2) || n.connection?.saveData === true;
+}
+
 /** Lance la surveillance ; renvoie de quoi l'arrêter */
 export function surveillerFluidite(): () => void {
   const force = new URLSearchParams(window.location.search).get("leger");
-  if (force === "1") {
+  if (force === "1" || (force !== "0" && appareilModeste())) {
     alleger(false);
     return () => {};
   }
