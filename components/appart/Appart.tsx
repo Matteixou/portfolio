@@ -242,17 +242,24 @@ export default function Appart() {
       return Promise.resolve();
     }
     plateau.scrollTo({ left: cible, behavior: "smooth" });
-    // on attend la fin du défilement (scrollend, ou un délai de secours),
-    // puis on se cale exactement sur la pièce : la caméra en dépend
+    // on attend la fin du défilement (arrivé à destination, scrollend, ou un
+    // délai de secours), puis on se cale exactement sur la pièce : la caméra
+    // en dépend. (Safari avant la version 26 ne connaît pas scrollend : sans
+    // le test de position, il attendait toujours le secours, 1,4 s.)
     return new Promise<void>((fini) => {
       const finir = () => {
         plateau.removeEventListener("scrollend", finir);
+        plateau.removeEventListener("scroll", arrive);
         window.clearTimeout(secours);
         plateau.scrollLeft = cible;
         fini();
       };
+      const arrive = () => {
+        if (Math.abs(plateau.scrollLeft - cible) < 1) finir();
+      };
       const secours = window.setTimeout(finir, 1400);
       plateau.addEventListener("scrollend", finir);
+      plateau.addEventListener("scroll", arrive, { passive: true });
     });
   }, [monter]);
 

@@ -182,10 +182,15 @@ Règles de fluidité, apprises en mesurant (à respecter quand on ajoute quelque
   ratées ; si l'appareil décroche nettement (3 mesures sur 6 avec plus de 30 % d'images ratées), le site
   passe en « léger » pour la session : sans parallaxe, sans lueur floue au survol (léger soulèvement à la
   place), sans poussière, oiseaux, feuilles lointaines, lucioles ; nuages et lueurs figés. Rien n'est mesuré
-  pendant l'arrivée ni dans les 3 s qui suivent. Un appareil qui se déclare modeste (`navigator.deviceMemory`
-  ≤ 2 Go, ou économie de données) est en léger d'emblée et entre directement dans le salon, sans l'arrivée
-  animée : décidé par le script du `<head>` (`app/layout.tsx`), avant le premier affichage. Pour essayer :
-  `?leger=1` (forcé) ou `?leger=0`.
+  pendant l'arrivée ni dans les 3 s qui suivent. Un appareil modeste est en léger d'emblée et entre directement
+  dans le salon, sans l'arrivée animée, décidé par le script du `<head>` (`app/layout.tsx`) avant le premier
+  affichage, **sur tous les navigateurs** : un mini-test de vitesse de 6 ms (score sous 50, soit plus de ~3,5 fois
+  plus lent qu'un PC portable récent, qui fait ~190), ou un appareil qui se déclare modeste
+  (`navigator.deviceMemory` ≤ 2 Go, économie de données ; Chrome, Edge et Android seulement). Le score est gardé
+  sur `<html data-vitesse>` : à demander à un visiteur qui signale un souci. Pour essayer : `?leger=1` (forcé)
+  ou `?leger=0`.
+- **Sans `scrollend`** (Safari avant la version 26) : aller dans une autre pièce s'arrête dès que le défilement
+  atteint sa destination, au lieu d'attendre le délai de secours (ouvrir le volley depuis le salon : 1,5 → 0,7 s).
 - **Pas de lecture de mise en page à chaque image** (largeur de la pièce, position du chat : gardées en mémoire).
 - **Animations CSS toujours nommées en entier** : le CSS compilé vide un raccourci `animation:` sans nom.
 - **La toute première ouverture d'un panneau** dans un navigateur neuf marque un temps (~150-250 ms sur une carte

@@ -5,8 +5,10 @@
    animations d'ambiance (poussière, oiseaux, nuages, feuilles, lueurs).
    Les appareils qui suivent gardent tout.
 
-   D'emblée si l'appareil se déclare modeste (2 Go de mémoire ou moins,
-   économie de données). Sinon, mesuré : pendant les premiers gestes (souris, défilement,
+   D'emblée si l'appareil est modeste : décidé avant le premier affichage
+   par le script du <head> (app/layout.tsx : mini-test de vitesse de 6 ms
+   sur tous les navigateurs, mémoire déclarée, économie de données).
+   Sinon, mesuré : pendant les premiers gestes (souris, défilement,
    ouverture d'un coin), on compte les images ratées sur ~1 s, au plus six
    fois. Trois mesures franchement mauvaises → léger, pour toute la session
    (pas au-delà : une première visite paie aussi la mise en route de la
@@ -49,6 +51,8 @@ function appareilModeste() {
 /** Lance la surveillance ; renvoie de quoi l'arrêter */
 export function surveillerFluidite(): () => void {
   const force = new URLSearchParams(window.location.search).get("leger");
+  // déjà décidé par le script du <head> (mini-test de vitesse, mémoire)
+  if (estLeger()) return () => {};
   if (force === "1" || (force !== "0" && appareilModeste())) {
     alleger(false);
     return () => {};
